@@ -1,0 +1,58 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model colleagues {
+  id               Int                @id @default(autoincrement())
+  email            String             @unique
+  name             String?
+  picture_url      String?
+  role             roles              @relation(fields: [rolesId], references: [id])
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  rolesId          Int
+  collegues_skills collegues_skills[]
+}
+
+// admin, collegue, sales
+model roles {
+  id        Int          @id @default(autoincrement())
+  name      String       @unique
+  collegues colleagues[]
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+}
+
+model skills {
+  id               Int                @id @default(autoincrement())
+  name             String             @unique
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  categoriesId     Int
+  collegues_skills collegues_skills[]
+}
+
+model collegues_skills {
+  id          Int        @id @default(autoincrement())
+  colleagueId Int
+  colleague   colleagues @relation(fields: [colleagueId], references: [id])
+  skillId     Int
+  skill       skills     @relation(fields: [skillId], references: [id])
+  ability     Int
+  interest    Int
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model categories {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+}
