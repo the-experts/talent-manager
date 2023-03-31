@@ -14,13 +14,13 @@ const App: React.FC = () => {
         setIsOpen(true)
     }
 
-    const handleSubmit = async (event:Event) => {
+    const handleSubmit = async (event: React.FormEvent<CategoryFormElement>) => {
         // Stop the form from submitting and refreshing the page.
         event.preventDefault()
 
         // Get data from the form.
         const data = {
-            name: event.target?.categoryName.value,
+            name: event.currentTarget.elements.categoryName.value
         }
 
         // Send the data to the server in JSON format.
@@ -52,6 +52,7 @@ const App: React.FC = () => {
         console.log(result);
     }
 
+    // @ts-ignore
     return (
         <>
             <Button onClick={openModal}>

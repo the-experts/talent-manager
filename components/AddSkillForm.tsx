@@ -21,14 +21,14 @@ const App: React.FC<AddSkillFormProps> = (props:AddSkillFormProps) => {
         setIsOpen(true)
     }
 
-    const handleSubmit = async (event) => {
+    const handleSubmit = async (event: React.FormEvent<SkillFormElement>) => {
         // Stop the form from submitting and refreshing the page.
         event.preventDefault()
 
         // Get data from the form.
         const data = {
-            skillName: event.target.skillName.value,
-            categoryId: event.target.categoryId.value,
+            skillName: event.currentTarget.elements.skillName.value,
+            categoryId: event.currentTarget.elements.categoryId.value
         }
 
         // Send the data to the server in JSON format.
