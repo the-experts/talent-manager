@@ -5,12 +5,12 @@ import React from "react";
 
 export default function Welcome() {
     const { data: session } = useSession();
-    const username = session?.user?.name;
+    const welcomeMessage = session?.user ? 'Welkom, ' + session?.user?.name + '!' : 'Welcome! Please log in.';
 
     return (
         <SessionProvider>
-            <Layout>
-                Welkom, { username }!
+            <Layout className={'text-black'}>
+                { welcomeMessage }
             </Layout>
         </SessionProvider>
     );
