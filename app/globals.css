@@ -1,13 +1,33 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 :root {
   --max-width: 1100px;
   --border-radius: 12px;
-  --font-mono: ui-monospace, Menlo, Monaco, 'Cascadia Mono', 'Segoe UI Mono',
-    'Roboto Mono', 'Oxygen Mono', 'Ubuntu Monospace', 'Source Code Pro',
-    'Fira Mono', 'Droid Sans Mono', 'Courier New', monospace;
+
+  /* TODO: Decide if we want to keep these fonts */
+  /*--font-mono: Plus Jakarta Sans, ui-monospace, Menlo, Monaco, 'Cascadia Mono', 'Segoe UI Mono',*/
+  /*  'Roboto Mono', 'Oxygen Mono', 'Ubuntu Monospace', 'Source Code Pro',*/
+  /*  'Fira Mono', 'Droid Sans Mono', 'Courier New', monospace;*/
+
+  --font-family: 'Plus Jakarta Sans', sans-serif;
 
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
+
+  /* the/experts color scheme: */
+  --color-experts-black: #000;
+  --color-experts-midnight: #1E222D;
+  --color-experts-dark-grey: #2C2F36;
+  --color-experts-mid-grey: #545760;
+  --color-experts-light-grey: #AFB1B8;
+  --color-experts-orange: #FF710B;
+  --color-experts-white: #FFF;
+  /* ************************** */
 
   --primary-glow: conic-gradient(
     from 180deg at 50% 50%,
@@ -83,6 +103,7 @@ html,
 body {
   max-width: 100vw;
   overflow-x: hidden;
+  font-family: var(--font-family);
 }
 
 body {
@@ -100,8 +121,78 @@ a {
   text-decoration: none;
 }
 
+/* Custom classes for components */
+.header {
+  background-color: var(--color-experts-midnight);
+  color: var(--color-experts-light-grey);
+}
+
+.footer {
+  background-color: var(--color-experts-black);
+  color: var(--color-experts-light-grey);
+}
+
+/* Media Queries */
 @media (prefers-color-scheme: dark) {
   html {
     color-scheme: dark;
   }
+}
+
+/* Color classes */
+.color-experts-black {
+  color: var(--color-experts-black);
+}
+
+.color-experts-midnight {
+  color: var(--color-experts-midnight);
+}
+
+.color-experts-dark-grey {
+  color: var(--color-experts-dark-grey);
+}
+
+.color-experts-mid-grey {
+  color: var(--color-experts-mid-grey);
+}
+
+.color-experts-light-grey {
+  color: var(--color-experts-light-grey);
+}
+
+.color-experts-orange {
+  color: var(--color-experts-orange);
+}
+
+.color-experts-white {
+  color: var(--color-experts-white);
+}
+
+/* Background Color classes */
+.bg-color-experts-black {
+  background-color: var(--color-experts-black);
+}
+
+.bg-color-experts-midnight {
+  background-color: var(--color-experts-midnight);
+}
+
+.bg-color-experts-dark-grey {
+  background-color: var(--color-experts-dark-grey);
+}
+
+.bg-color-experts-mid-grey {
+  background-color: var(--color-experts-mid-grey);
+}
+
+.bg-color-experts-light-grey {
+  background-color: var(--color-experts-light-grey);
+}
+
+.bg-color-experts-orange {
+  background-color: var(--color-experts-orange);
+}
+
+.bg-color-experts-white {
+  background-color: var(--color-experts-white);
 }

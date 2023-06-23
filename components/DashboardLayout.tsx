@@ -1,12 +1,14 @@
 "use client"
 import Image from "next/image";
 import theexperts from "../public/images/the-experts.svg";
-import {signOut} from "next-auth/react";
+import {signIn, signOut, useSession} from "next-auth/react";
 import {Button, Layout, Menu} from "antd";
 import React from "react";
 import {ItemType} from "antd/lib/menu/hooks/useItems";
 import {UserOutlined} from "@ant-design/icons";
 import {useRouter} from "next/navigation";
+import {Footer} from "antd/es/layout/layout";
+import LoginPage from "@/app/login/page";
 const {Header, Content, Sider} = Layout;
 
 type DashboardLayoutProps = {
@@ -15,7 +17,8 @@ type DashboardLayoutProps = {
 
 export default function DashboardLayout({children}: DashboardLayoutProps) {
 
-    const router = useRouter()
+    const router = useRouter();
+    const { data: session } = useSession();
 
     const menuItems: ItemType[] = [{
         key: '1',
@@ -31,7 +34,12 @@ export default function DashboardLayout({children}: DashboardLayoutProps) {
         onClick: () => {
             router.push('/collegas')
         }
-    }]
+    }];
+
+    const loginLogout = session ?
+        (<Button className={'text-white'} onClick={() => signOut()}>Logout</Button>)
+        :
+        (<Button className={'text-white'} onClick={() => signIn('google')}>Log In</Button>);
 
     return (
         <Layout className={'h-screen'}>
@@ -40,7 +48,7 @@ export default function DashboardLayout({children}: DashboardLayoutProps) {
                     <Image src={theexperts} alt={'the-experts-company-logo'}/>
                 </div>
                 <div className={'w-44 mt-2'}>
-                    <Button onClick={() => signOut()}>Logout</Button>
+                    <LoginPage />
                 </div>
             </Header>
             <Layout>
@@ -66,6 +74,7 @@ export default function DashboardLayout({children}: DashboardLayoutProps) {
                     </Content>
                 </Layout>
             </Layout>
+            <Footer className={'footer'}>Hier komt straks een footer te staan</Footer>
         </Layout>
     );
 }

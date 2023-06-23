@@ -67,7 +67,7 @@ export default function Skills(props: any) {
                         )}
                     </Tab>
                 </Tab.List>
-                <Tab.Panels>
+                <Tab.Panels className={'text-black'}>
                     <Tab.Panel>Content Alles</Tab.Panel>
                     <Tab.Panel>Content Techniques</Tab.Panel>
                     <Tab.Panel>Content Tools</Tab.Panel>
