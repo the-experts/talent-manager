@@ -1,5 +1,4 @@
 "use client"
-import {SessionProvider} from "next-auth/react";
 
 export default function ProvidersWrapper({
                                        children
@@ -7,8 +6,8 @@ export default function ProvidersWrapper({
     children: React.ReactNode
 }) {
     return (
-        <SessionProvider>
+        <div>
             {children} { /* our entire app -> has access to NextAuth */ }
-        </SessionProvider>
+        </div>
     )
 }

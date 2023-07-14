@@ -1,18 +1,18 @@
 import './globals.css'
-import ProvidersWrapper from "@/app/ProvidersWrapper";
+import { ClerkProvider } from '@clerk/nextjs';
 
 export default function RootLayout({
-  children
+  children,
 }: {
   children: React.ReactNode
 }) {
   return (
     <html lang="en">
-      <body className={'font-plus-jakarta-sans'}>
-      <ProvidersWrapper>
-        {children}
-      </ProvidersWrapper>
-      </body>
+      <ClerkProvider>
+        <body>
+            {children}
+        </body>
+      </ClerkProvider>
     </html>
   )
 }

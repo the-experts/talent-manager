@@ -1,8 +1,7 @@
 "use client"
 import Image from "next/image";
 import theexperts from "../public/images/the-experts.svg";
-import {signIn, signOut, useSession} from "next-auth/react";
-import {Button, Layout, Menu} from "antd";
+import {Layout, Menu} from "antd";
 import React from "react";
 import {ItemType} from "antd/lib/menu/hooks/useItems";
 import {UserOutlined} from "@ant-design/icons";
@@ -18,7 +17,6 @@ type DashboardLayoutProps = {
 export default function DashboardLayout({children}: DashboardLayoutProps) {
 
     const router = useRouter();
-    const { data: session } = useSession();
 
     const menuItems: ItemType[] = [{
         key: '1',
@@ -35,11 +33,6 @@ export default function DashboardLayout({children}: DashboardLayoutProps) {
             router.push('/collegas')
         }
     }];
-
-    const loginLogout = session ?
-        (<Button className={'text-white'} onClick={() => signOut()}>Logout</Button>)
-        :
-        (<Button className={'text-white'} onClick={() => signIn('google')}>Log In</Button>);
 
     return (
         <Layout className={'h-screen'}>

@@ -1,13 +1,11 @@
 "use client"
-import type {NextPage} from 'next'
+
 import React from 'react';
 import DashboardLayout from "../components/DashboardLayout";
 import Welcome from "../components/Welcome";
 import Skills from "../components/skills";
 import {Button} from "antd";
-import {SessionProvider} from "next-auth/react";
 import {Session} from "inspector";
-import {ISODateString} from "next-auth";
 
 function addSkill() {
   console.log('addSkill called');
@@ -15,9 +13,9 @@ function addSkill() {
 
 export interface ExpirableSession extends Session {
         expires: ISODateString
-};
+}
 
-const Home = (session: ExpirableSession) => {
+const Home = (_session: ExpirableSession) => {
   return (
           <DashboardLayout>
               <Welcome></Welcome>
