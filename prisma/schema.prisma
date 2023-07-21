@@ -1,55 +1,53 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url = env("POSTGRES_PRISMA_URL") // uses connection pooling
+  directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+  shadowDatabaseUrl = env("POSTGRES_URL_NON_POOLING") // used for migrations
 }
 
 model colleagues {
-  id               Int                @id @default(autoincrement())
-  email            String             @unique
-  name             String?
-  picture_url      String?
-  role             roles              @relation(fields: [rolesId], references: [id])
-  createdAt        DateTime           @default(now())
-  updatedAt        DateTime           @updatedAt
-  rolesId          Int
-  collegues_skills collegues_skills[]
+  id                String              @id
+  email             String              @unique
+  name              String?
+  picture_url       String?
+  created_at        DateTime            @default(now())
+  updated_at        DateTime            @updatedAt
+  roles_id          Int
+  role              roles               @relation(fields: [roles_id], references: [id])
+  colleagues_skills colleagues_skills[]
 }
 
-// admin, collegue, sales
 model roles {
-  id        Int          @id @default(autoincrement())
-  name      String       @unique
-  collegues colleagues[]
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
+  id         Int          @id @default(autoincrement())
+  name       String       @unique
+  created_at DateTime     @default(now())
+  updated_at DateTime     @updatedAt
+  colleagues colleagues[]
 }
 
 model skills {
-  id               Int                @id @default(autoincrement())
-  name             String             @unique
-  createdAt        DateTime           @default(now())
-  updatedAt        DateTime           @updatedAt
-  categoriesId     Int
-  collegues_skills collegues_skills[]
+  id                Int                 @id @default(autoincrement())
+  name              String              @unique
+  created_at        DateTime            @default(now())
+  updated_at        DateTime            @updatedAt
+  categories_id     Int
+  colleagues_skills colleagues_skills[]
 }
 
-model collegues_skills {
-  id          Int        @id @default(autoincrement())
-  colleagueId Int
-  colleague   colleagues @relation(fields: [colleagueId], references: [id])
-  skillId     Int
-  skill       skills     @relation(fields: [skillId], references: [id])
-  ability     Int
-  interest    Int
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+model colleagues_skills {
+  id           Int        @id @default(autoincrement())
+  colleague_id String
+  skill_id     Int
+  ability      Int
+  interest     Int
+  created_at   DateTime   @default(now())
+  updated_at   DateTime   @updatedAt
+  colleague    colleagues @relation(fields: [colleague_id], references: [id])
+  skill        skills     @relation(fields: [skill_id], references: [id])
 }
 
 model categories {

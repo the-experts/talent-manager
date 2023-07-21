@@ -1,3 +1,5 @@
+import {PrismaClient} from "@prisma/client";
+const prisma = new PrismaClient()
 
 async function main() {
     const techniques = await prisma.categories.upsert({
@@ -32,6 +34,33 @@ async function main() {
         },
     })
     console.log({ techniques, tools, platforms, languages })
+
+
+    const adminRole = await prisma.roles.upsert({
+        where: { name: 'Administrator' },
+        update: {},
+        create: {
+            name: 'Administrator',
+        },
+    })
+
+    const salesRole = await prisma.roles.upsert({
+        where: { name: 'Sales' },
+        update: {},
+        create: {
+            name: 'Sales',
+        },
+    })
+
+    const employeeRole = await prisma.roles.upsert({
+        where: { name: 'Employee' },
+        update: {},
+        create: {
+            name: 'Employee',
+        },
+    })
+
+    console.log({ adminRole, salesRole, employeeRole })
 }
 
 main()
