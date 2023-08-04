@@ -3,10 +3,10 @@ const prisma = new PrismaClient()
 
 async function main() {
     const techniques = await prisma.categories.upsert({
-        where: { name: 'Techniques' },
+        where: { name: 'Technieken' },
         update: {},
         create: {
-            name: 'Techniques',
+            name: 'Technieken',
         },
     })
 
@@ -19,21 +19,28 @@ async function main() {
     })
 
     const platforms = await prisma.categories.upsert({
-        where: { name: 'Platforms' },
+        where: { name: 'Platformen' },
         update: {},
         create: {
-            name: 'Platforms',
+            name: 'Platformen',
         },
     })
 
     const languages = await prisma.categories.upsert({
-        where: { name: 'Languages' },
+        where: { name: 'Programmeertalen' },
         update: {},
         create: {
-            name: 'Languages',
+            name: 'Programmeertalen',
         },
     })
-    console.log({ techniques, tools, platforms, languages })
+
+    const other = await prisma.categories.upsert({
+        where: { name: 'Anders' },
+        update: {},
+        create: {
+            name: 'Anders',
+        },
+    })
 
 
     const adminRole = await prisma.roles.upsert({

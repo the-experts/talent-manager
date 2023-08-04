@@ -1,11 +1,11 @@
 -- CreateTable
 CREATE TABLE "colleagues" (
-    "id" SERIAL NOT NULL,
+    "id" SERIAL,
     "email" TEXT NOT NULL,
     "name" TEXT,
     "picture_url" TEXT,
-    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" TIMESTAMP(3) NOT NULL,
+    "created_at" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3),
     "roles_id" INTEGER NOT NULL,
 
     CONSTRAINT "colleagues_pkey" PRIMARY KEY ("id")
