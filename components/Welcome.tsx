@@ -1,3 +1,5 @@
+'use client';
+
 import {Layout} from "antd";
 import React from "react";
 import {useUser} from "@clerk/nextjs";
@@ -6,7 +8,7 @@ export default function Welcome() {
     // Use the useUser hook to get the Clerk.user object
     const { user, isLoaded } = useUser();
 
-    const checkIfUserExists = async e => {
+    const checkIfUserExists = async () => {
         if (user) {
             try {
                 const body = { id: user.id };
@@ -21,7 +23,7 @@ export default function Welcome() {
             }
         }
     }
-    
+
 
     if (!isLoaded) {
         return (<div>Loading</div>);
@@ -32,9 +34,7 @@ export default function Welcome() {
     const welcomeMessage = user ? 'Welkom, ' + user.fullName + '!' : 'Welcome! Please log in.';
 
     // check if user exists in db
-        // if not: create with clerk user.id, user.fullName, user.primaryEmailAddress.emailAddress
-
-
+    // if not: create with clerk user.id, user.fullName, user.primaryEmailAddress.emailAddress
 
     return (
         <div>

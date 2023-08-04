@@ -1,21 +1,16 @@
-"use client"
+'use client';
 
 import React from 'react';
 import DashboardLayout from "../components/DashboardLayout";
 import Welcome from "../components/Welcome";
-import Skills from "../components/skills";
 import {Button} from "antd";
-import {Session} from "inspector";
+import Skills from "@/components/Skills";
 
 function addSkill() {
   console.log('addSkill called');
 }
 
-export interface ExpirableSession extends Session {
-        expires: ISODateString
-}
-
-const Home = (_session: ExpirableSession) => {
+export default function Home() {
   return (
           <DashboardLayout>
               <Welcome></Welcome>
@@ -26,5 +21,3 @@ const Home = (_session: ExpirableSession) => {
           </DashboardLayout>
   )
 }
-
-export default Home
