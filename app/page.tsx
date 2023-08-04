@@ -10,7 +10,7 @@ function addSkill() {
   console.log('addSkill called');
 }
 
-export default function Home() {
+export default function Home():JSX.Element {
   return (
           <DashboardLayout>
               <Welcome></Welcome>

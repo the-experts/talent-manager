@@ -23,7 +23,7 @@ const Skills = (props: any) => {
                     </Tab>
                     {
                         categories.map((category: Category) => (
-                            <Tab as={Fragment}>
+                            <Tab key={category.id} as={Fragment}>
                                 {({selected}) => (
                                     <button
                                         className={
@@ -40,7 +40,7 @@ const Skills = (props: any) => {
                     <Tab.Panel>Content Alles</Tab.Panel>
                     {
                         categories.map((category: Category) => (
-                            <Tab.Panel>Content {category.name}</Tab.Panel>
+                            <Tab.Panel key={category.id}>Content {category.name}</Tab.Panel>
                         ))
                     }
                 </Tab.Panels>
