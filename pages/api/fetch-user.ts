@@ -7,13 +7,11 @@ export default async function handler(
 ) {
     try {
         const email = request.query.email as string;
+        if (!email) throw new Error('Email is required');
 
-        if (!email) throw new Error('Email are required');
-        await sql`SELECT id FROM colleagues WHERE email = (${email});`;
+        const userExistQuery = await sql`SELECT id FROM colleagues WHERE email = (${email});`;
+        return response.status(200).json({ userExistQuery });
     } catch (error) {
         return response.status(500).json({ error });
     }
-
-    const colleagues = await sql`SELECT * FROM colleagues;`;
-    return response.status(200).json({ colleagues });
 }

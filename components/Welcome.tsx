@@ -3,33 +3,27 @@
 import {Layout} from "antd";
 import React from "react";
 import {useUser} from "@clerk/nextjs";
+import {useCreateNewUser, useUserExistsOrNot} from "@/app/hooks/user";
 
 export default function Welcome() {
     // Use the useUser hook to get the Clerk.user object
     const { user, isLoaded } = useUser();
-
-    const checkIfUserExists = async () => {
-        if (user) {
-            try {
-                const body = { id: user.id };
-                const userRecord = await fetch(`/api/fetch-user`, {
-                    method: "POST",
-                    headers: {"Content-Type": "application/json"},
-                    body: JSON.stringify(body),
-                })
-                console.log('userRecord', userRecord)
-            } catch (error) {
-                console.error(error);
-            }
-        }
-    }
-
+    console.log('user', user?.primaryEmailAddress?.emailAddress)
 
     if (!isLoaded) {
         return (<div>Loading</div>);
     }
 
-    console.log('user', user)
+    const { data, isLoading } = useUserExistsOrNot(user?.primaryEmailAddress?.emailAddress);
+    console.log('userExistsOrNot data', data);
+
+    if (isLoading) {
+        return (<div>Loading</div>);
+    }
+
+    // TODO: only call below hook when user is not present in DB / returned from above hook
+    // const { data: createdUserData, isLoading: isLoadingUserData, isError: isErrorPresent } = useCreateNewUser(user?.primaryEmailAddress?.emailAddress, user?.fullName, 3);
+    // console.log(createdUserData);
 
     const welcomeMessage = user ? 'Welkom, ' + user.fullName + '!' : 'Welcome! Please log in.';
 

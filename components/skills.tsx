@@ -22,7 +22,7 @@ const Skills = (props: any) => {
                         )}
                     </Tab>
                     {
-                        categories.map((category: Category) => (
+                        categories?.map((category: Category) => (
                             <Tab key={category.id} as={Fragment}>
                                 {({selected}) => (
                                     <button
@@ -39,7 +39,7 @@ const Skills = (props: any) => {
                 <Tab.Panels className={'text-black'}>
                     <Tab.Panel>Content Alles</Tab.Panel>
                     {
-                        categories.map((category: Category) => (
+                        categories?.map((category: Category) => (
                             <Tab.Panel key={category.id}>Content {category.name}</Tab.Panel>
                         ))
                     }
