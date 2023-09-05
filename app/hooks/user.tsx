@@ -1,46 +1,55 @@
-import useSWR from "swr";
-import {fetcher} from "@/app/hooks/helper";
-import {UserResource} from "@clerk/types";
+import {useEffect, useState} from "react";
+import axios from "axios";
+import {useUser} from "@clerk/nextjs";
 
-export function useUserExistsOrNot (email: string = '') {
-    if (!email) {
-        return {
-            data: null,
-            isLoading: false,
-            isError: true
-        }
-    }
-        const { data, error, isLoading } = useSWR(`/api/fetch-user?email=${email}`, fetcher)
+export function useUserDataHandling (): DbUser|null {
+    const {user, isLoaded} = useUser();
+    const [dbUser, setDbUser] = useState(null);
 
-        return {
-            data,
-            isLoading,
-            isError: error
+    useEffect(() => {
+    const fetchData = async () => {
+        if (!user) {
+            return;
         }
+
+        try {
+            const res = await axios.post('/api/fetch-user', {email: user?.primaryEmailAddress?.emailAddress ?? ''})
+                .catch((error) => {
+                    console.error('post error fetch-user', error);
+                });
+
+            const rowCount = res?.data?.userExistQuery?.rowCount;
+;
+            if (rowCount === 1) {
+                // user already exists in DB, return existing user
+                setDbUser(res?.data.userExistQuery?.rows[0]);
+            } else if (rowCount === 0) {
+                const email = user?.primaryEmailAddress?.emailAddress;
+                const name = user?.fullName;
+
+                const res = await axios.post('/api/add-user', {email: email, name: name, roles_id: 3});
+                const userAddedToDb = await res?.data?.addUserQuery?.rows[0];
+                setDbUser(userAddedToDb);
+
+                if (userAddedToDb) {
+                    console.info('added user ' + email + ' to database');
+                }
+            }
+
+        } catch (error) {
+            console.error('error:', error)
+        }
+    };
+
+    fetchData();
+    }, [user]);
+
+    return dbUser;
 }
 
-export function useCreateNewUser(user: UserResource|null|undefined, roleId?: number) {
-    // email, name, roles_id
-    // roles: Admin: 1, Sales: 2, Employee: 3
-
-    if (!user) {
-        return {
-            data: null,
-            isLoading: false,
-            isError: true
-        }
-    }
-
-        const email = user?.primaryEmailAddress?.emailAddress;
-        const name = user?.fullName;
-
-        const { data, error, isLoading } = useSWR(`/api/add-user?email=${email}&name=${name}&role=${roleId ?? 3}`, fetcher)
-
-        console.log('create user data', data);
-
-        return {
-            data,
-            isLoading,
-            isError: error
-        }
+export type DbUser = {
+    name: string;
+    email: string;
+    roles_id: string;
 }
+

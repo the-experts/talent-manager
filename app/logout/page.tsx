@@ -1,11 +1,11 @@
 'use client';
 
 import React from "react";
-import {SignInButton} from "@clerk/nextjs";
+import {SignOutButton} from "@clerk/nextjs";
 
 const Page = () => {
     return  (
-        <SignInButton>Log In</SignInButton>
+        <SignOutButton>Log Out</SignOutButton>
     );
 };
 

@@ -40,7 +40,7 @@ CREATE TABLE "colleagues_skills" (
     "ability" INTEGER NOT NULL,
     "interest" INTEGER NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" TIMESTAMP(3) NOT NULL,
+    "updated_at" TIMESTAMP(3),
 
     CONSTRAINT "colleagues_skills_pkey" PRIMARY KEY ("id")
 );

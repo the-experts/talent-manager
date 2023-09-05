@@ -7,6 +7,7 @@ import {ItemType} from "antd/lib/menu/hooks/useItems";
 import {UserOutlined} from "@ant-design/icons";
 import {useRouter} from "next/navigation";
 import {Footer} from "antd/es/layout/layout";
+import LogoutPage from "@/app/logout/page";
 import LoginPage from "@/app/login/page";
 const {Header, Content, Sider} = Layout;
 
@@ -41,6 +42,7 @@ export default function DashboardLayout({children}: DashboardLayoutProps) {
                     <Image src={theexperts} alt={'the-experts-company-logo'}/>
                 </div>
                 <div className={'w-44 mt-2'}>
+                    <LogoutPage />
                     <LoginPage />
                 </div>
             </Header>

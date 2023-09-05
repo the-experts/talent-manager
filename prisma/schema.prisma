@@ -15,7 +15,7 @@ model colleagues {
   name              String?
   picture_url       String?
   created_at        DateTime            @default(now())
-  updated_at        DateTime            @updatedAt
+  updated_at        DateTime?           @updatedAt
   roles_id          Int
   role              roles               @relation(fields: [roles_id], references: [id])
   colleagues_skills colleagues_skills[]
@@ -40,7 +40,7 @@ model skills {
 
 model colleagues_skills {
   id           Int        @id @default(autoincrement())
-  colleague_id String
+  colleague_id Int
   skill_id     Int
   ability      Int
   interest     Int

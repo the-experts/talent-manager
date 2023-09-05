@@ -2,9 +2,9 @@
 
 import React from 'react';
 import DashboardLayout from "../components/DashboardLayout";
-import Welcome from "../components/Welcome";
+import Welcome from "./Welcome";
 import {Button} from "antd";
-import Skills from "@/components/Skills";
+import Skills from "./Skills";
 
 function addSkill() {
   console.log('addSkill called');

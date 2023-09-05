@@ -5,7 +5,7 @@ import { Tab } from "@headlessui/react";
 import {Category, useAllCategories} from "@/app/hooks/categories";
 
 const Skills = (props: any) => {
-    const { categories } = useAllCategories();
+    const categories: Category[] = useAllCategories();
 
     return (
         <div className={props.className}>

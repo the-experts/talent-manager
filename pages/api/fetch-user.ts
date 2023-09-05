@@ -6,10 +6,10 @@ export default async function handler(
     response: NextApiResponse,
 ) {
     try {
-        const email = request.query.email as string;
+        const email = request.body.email as string;
         if (!email) throw new Error('Email is required');
 
-        const userExistQuery = await sql`SELECT id FROM colleagues WHERE email = (${email});`;
+        const userExistQuery = await sql`SELECT id, name, email FROM colleagues WHERE email = (${email});`;
         return response.status(200).json({ userExistQuery });
     } catch (error) {
         return response.status(500).json({ error });
