@@ -196,3 +196,7 @@ a {
 .bg-color-experts-white {
   background-color: var(--color-experts-white);
 }
+
+button.ant-btn-primary {
+  background-color: #1677ff !important;
+}

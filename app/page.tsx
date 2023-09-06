@@ -1,14 +1,10 @@
 'use client';
 
 import React, {useState} from 'react';
-import DashboardLayout from "../components/DashboardLayout";
+import DashboardLayout from "./DashboardLayout";
 import Welcome from "./Welcome";
-import {Button} from "antd";
 import Skills from "./Skills";
-
-function addSkill() {
-  console.log('addSkill called');
-}
+import ModalWrapper from "@/app/ModalWrapper";
 
 export default function Home():JSX.Element {
     const [dbUser, setDbUser] = useState(null);
@@ -23,7 +19,7 @@ export default function Home():JSX.Element {
               <Welcome handleCallback={UserDataCallback}></Welcome>
               <div className={'flex place-content-between'}>
                   <Skills className={'my-6 w-4/5'}></Skills>
-                  <Button className={'my-6 ml-3 w-1/6'} onClick={() => addSkill()}>Skill toevoegen</Button>
+                  <ModalWrapper className={'my-6 ml-3 w-1/6'} />
               </div>
           </DashboardLayout>
     )
