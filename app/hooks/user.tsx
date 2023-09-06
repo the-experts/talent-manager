@@ -19,7 +19,7 @@ export function useUserDataHandling (): DbUser|null {
                 });
 
             const rowCount = res?.data?.userExistQuery?.rowCount;
-;
+
             if (rowCount === 1) {
                 // user already exists in DB, return existing user
                 setDbUser(res?.data.userExistQuery?.rows[0]);
@@ -48,8 +48,9 @@ export function useUserDataHandling (): DbUser|null {
 }
 
 export type DbUser = {
+    id: number;
     name: string;
     email: string;
-    roles_id: string;
+    roles_id: number;
 }
 

@@ -9,14 +9,15 @@ import {useRouter} from "next/navigation";
 import {Footer} from "antd/es/layout/layout";
 import LogoutPage from "@/app/logout/page";
 import LoginPage from "@/app/login/page";
+import {DbUser} from "@/app/hooks/user";
 const {Header, Content, Sider} = Layout;
 
 type DashboardLayoutProps = {
     children: React.ReactNode,
+    user?: DbUser|null
 };
 
-export default function DashboardLayout({children}: DashboardLayoutProps) {
-
+export default function DashboardLayout({children, user}: DashboardLayoutProps) {
     const router = useRouter();
 
     const menuItems: ItemType[] = [{
@@ -26,14 +27,16 @@ export default function DashboardLayout({children}: DashboardLayoutProps) {
         onClick: () => {
             router.push('/')
         }
-    }, {
+    },
+        (user?.roles_id === 1 || user?.roles_id === 2) ? {
         key: '2',
         label: 'Collega\'s',
         icon: <UserOutlined/>,
         onClick: () => {
             router.push('/collegas')
         }
-    }];
+    } : null
+    ];
 
     return (
         <Layout className={'h-screen'}>

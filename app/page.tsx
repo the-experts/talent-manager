@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, {useState} from 'react';
 import DashboardLayout from "../components/DashboardLayout";
 import Welcome from "./Welcome";
 import {Button} from "antd";
@@ -11,13 +11,20 @@ function addSkill() {
 }
 
 export default function Home():JSX.Element {
-  return (
-          <DashboardLayout>
-              <Welcome></Welcome>
+    const [dbUser, setDbUser] = useState(null);
+
+    function UserDataCallback(userData: React.SetStateAction<null>) {
+        setDbUser(userData);
+        return userData;
+    }
+
+    return (
+          <DashboardLayout user={dbUser}>
+              <Welcome handleCallback={UserDataCallback}></Welcome>
               <div className={'flex place-content-between'}>
                   <Skills className={'my-6 w-4/5'}></Skills>
                   <Button className={'my-6 ml-3 w-1/6'} onClick={() => addSkill()}>Skill toevoegen</Button>
               </div>
           </DashboardLayout>
-  )
+    )
 }
