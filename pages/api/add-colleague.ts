@@ -21,7 +21,4 @@ export default async function handler(
     } catch (error) {
         return response.status(500).json({ error });
     }
-
-    const colleagues = await sql`SELECT * FROM colleagues;`;
-    return response.status(200).json({ colleagues });
 }

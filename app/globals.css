@@ -200,3 +200,15 @@ a {
 button.ant-btn-primary {
   background-color: #1677ff !important;
 }
+
+li.ant-list-item > button:first-of-type {
+  margin-left: auto;
+}
+
+button.ant-btn-primary.add-row-button {
+  margin: 16px 0;
+}
+
+button[aria-selected="true"][role="tab"] {
+  background-color: var(--color-experts-orange);
+}

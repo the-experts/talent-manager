@@ -15,3 +15,9 @@ export default async function handler(
         return response.status(500).json({ error });
     }
 }
+
+export type Colleague = {
+    id: number;
+    name: string;
+    roles_id: number;
+}

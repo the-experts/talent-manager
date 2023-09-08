@@ -1,11 +1,17 @@
 'use client';
 
-import React, {Fragment} from "react";
+import React, {Fragment, useState} from "react";
 import { Tab } from "@headlessui/react";
 import {Category, useAllCategories} from "@/app/hooks/categories";
+import SkillList from "@/app/SkillList";
+import {Skill, useFetchAllSkills, useFetchUserSkills} from "@/app/hooks/skills";
 
 const Skills = (props: any) => {
     const categories: Category[] = useAllCategories();
+    const allSkills = useFetchAllSkills();
+    const colleagueSkills = useFetchUserSkills(props?.colleagueId);
+    console.log('allSkills: ', allSkills)
+    console.log('colleagueSkills: ', colleagueSkills)
 
     return (
         <div className={props.className}>
@@ -37,7 +43,13 @@ const Skills = (props: any) => {
                     }
                 </Tab.List>
                 <Tab.Panels className={'text-black'}>
-                    <Tab.Panel>Content Alles</Tab.Panel>
+                    <Tab.Panel>
+                         <SkillList
+                            allSkills={allSkills}
+                            colleagueId={props.colleagueId}
+                            colleagueSkills={colleagueSkills}
+                         />
+                    </Tab.Panel>
                     {
                         categories?.map((category: Category) => (
                             <Tab.Panel key={category.id}>Content {category.name}</Tab.Panel>

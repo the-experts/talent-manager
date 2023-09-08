@@ -13,9 +13,9 @@ export function useUserDataHandling (): DbUser|null {
         }
 
         try {
-            const res = await axios.post('/api/fetch-user', {email: user?.primaryEmailAddress?.emailAddress ?? ''})
+            const res = await axios.post('/api/fetch-colleague', {email: user?.primaryEmailAddress?.emailAddress ?? ''})
                 .catch((error) => {
-                    console.error('post error fetch-user', error);
+                    console.error('post error fetch-colleague', error);
                 });
 
             const rowCount = res?.data?.userExistQuery?.rowCount;
@@ -27,12 +27,12 @@ export function useUserDataHandling (): DbUser|null {
                 const email = user?.primaryEmailAddress?.emailAddress;
                 const name = user?.fullName;
 
-                const res = await axios.post('/api/add-user', {email: email, name: name, roles_id: 3});
+                const res = await axios.post('/api/add-colleague', {email: email, name: name, roles_id: 3});
                 const userAddedToDb = await res?.data?.addUserQuery?.rows[0];
                 setDbUser(userAddedToDb);
 
                 if (userAddedToDb) {
-                    console.info('added user ' + email + ' to database');
+                    console.info('added colleague ' + email + ' to database');
                 }
             }
 
