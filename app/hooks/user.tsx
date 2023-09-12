@@ -2,49 +2,50 @@ import {useEffect, useState} from "react";
 import axios from "axios";
 import {useUser} from "@clerk/nextjs";
 
-export function useUserDataHandling (): DbUser|null {
-    const {user, isLoaded} = useUser();
-    const [dbUser, setDbUser] = useState(null);
+export function useUserDataHandling() {
+    const {user, isSignedIn, isLoaded} = useUser();
+    const [dbUser, setDbUser] = useState<DbUser|null>(null);
+
 
     useEffect(() => {
-    const fetchData = async () => {
-        if (!user) {
-            return;
-        }
-
-        try {
-            const res = await axios.post('/api/fetch-colleague', {email: user?.primaryEmailAddress?.emailAddress ?? ''})
-                .catch((error) => {
-                    console.error('post error fetch-colleague', error);
-                });
-
-            const rowCount = res?.data?.userExistQuery?.rowCount;
-
-            if (rowCount === 1) {
-                // user already exists in DB, return existing user
-                setDbUser(res?.data.userExistQuery?.rows[0]);
-            } else if (rowCount === 0) {
-                const email = user?.primaryEmailAddress?.emailAddress;
-                const name = user?.fullName;
-
-                const res = await axios.post('/api/add-colleague', {email: email, name: name, roles_id: 3});
-                const userAddedToDb = await res?.data?.addUserQuery?.rows[0];
-                setDbUser(userAddedToDb);
-
-                if (userAddedToDb) {
-                    console.info('added colleague ' + email + ' to database');
-                }
+        const fetchData = async () => {
+            if (!user) {
+                return;
             }
 
-        } catch (error) {
-            console.error('error:', error)
-        }
-    };
+            try {
+                const res = await axios.post('/api/fetch-colleague', {email: user?.primaryEmailAddress?.emailAddress ?? ''})
+                    .catch((error) => {
+                        console.error('post error fetch-colleague', error);
+                    });
 
-    fetchData();
+                const rowCount = res?.data?.userExistQuery?.rowCount;
+
+                if (rowCount === 1) {
+                    // user already exists in DB, return existing user
+                    setDbUser(res?.data.userExistQuery?.rows[0]);
+                } else if (rowCount === 0) {
+                    const email = user?.primaryEmailAddress?.emailAddress;
+                    const name = user?.fullName;
+
+                    const res = await axios.post('/api/add-colleague', {email: email, name: name, roles_id: 3});
+                    const userAddedToDb = await res?.data?.addUserQuery?.rows[0];
+                    setDbUser(userAddedToDb);
+
+                    if (userAddedToDb) {
+                        console.info('added colleague ' + email + ' to database');
+                    }
+                }
+
+            } catch (error) {
+                console.error('error:', error)
+            }
+        };
+
+        fetchData();
     }, [user]);
 
-    return dbUser;
+    return { dbUser, isSignedIn, isLoaded };
 }
 
 export type DbUser = {

@@ -1,7 +1,5 @@
 import {useEffect, useState} from "react";
 import axios from "axios";
-import {useUser} from "@clerk/nextjs";
-import {DbUser} from "@/app/hooks/user";
 import {ColleagueSkillItem} from "@/app/SkillList";
 
 export function useFetchAllSkills(): Skill[] {
@@ -29,10 +27,14 @@ export function useFetchAllSkills(): Skill[] {
     return allSkills;
 }
 
-export function useFetchUserSkills(colleagueId: number): Skill[] {
+export function useFetchColleagueSkills(colleagueId: number): Skill[]|null {
     const [userSkills, setUserSkills] = useState([]);
 
     useEffect(() => {
+        if (!colleagueId) {
+            return;
+        }
+
         const fetchData = async () => {
             try {
                 const res = await axios.get(`/api/fetch-colleague-skills?colleague_id=${colleagueId}`)
@@ -44,7 +46,7 @@ export function useFetchUserSkills(colleagueId: number): Skill[] {
                 setUserSkills(rows);
 
             } catch (error) {
-                console.error('error:', error)
+                console.error('error:', error);
             }
         };
 
@@ -52,39 +54,6 @@ export function useFetchUserSkills(colleagueId: number): Skill[] {
     }, [colleagueId]);
 
     return userSkills;
-}
-
-export function useAddSkillToColleague (skill: ColleagueSkillItem) {
-    const [skillOfColleague, setSkillOfColleague] = useState(null);
-
-    useEffect(() => {
-        const saveSkillToColleague = async () => {
-            if (!skillOfColleague) {
-                return;
-            }
-
-            try {
-                const res = await axios.post('/api/add-skill-to-colleague',
-                    {skillForColleague: skillOfColleague ?? ''}
-                )
-                    .catch((error) => {
-                        console.error('post error add-skill-to-colleague', error);
-                    });
-
-                const rowCount = res?.data?.addSkillToColleagueQuery?.rowCount;
-
-                if (rowCount === 1) {
-                    setSkillOfColleague(res?.data.addSkillToColleagueQuery?.rows[0]);
-                }
-            } catch (error) {
-                console.error('error:', error)
-            }
-        };
-
-        saveSkillToColleague();
-    }, [skill]);
-
-    return skillOfColleague;
 }
 
 export type Skill = {

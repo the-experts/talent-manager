@@ -212,3 +212,19 @@ button.ant-btn-primary.add-row-button {
 button[aria-selected="true"][role="tab"] {
   background-color: var(--color-experts-orange);
 }
+
+.input-placeholder {
+  color: #bfbfbf;
+}
+
+.no-margin {
+  margin: 0
+}
+
+.margin-right {
+  margin-right: 8px;
+}
+
+.ant-select-auto-complete.width-200 {
+  width: 200px;
+}

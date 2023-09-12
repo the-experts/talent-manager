@@ -8,16 +8,15 @@ import {UserOutlined} from "@ant-design/icons";
 import {useRouter} from "next/navigation";
 import {Footer} from "antd/es/layout/layout";
 import LogoutPage from "@/app/logout/page";
-import LoginPage from "@/app/login/page";
 import {DbUser} from "@/app/hooks/user";
 const {Header, Content, Sider} = Layout;
 
 type DashboardLayoutProps = {
     children: React.ReactNode,
-    user?: DbUser|null
+    colleague?: DbUser|null
 };
 
-export default function DashboardLayout({children, user}: DashboardLayoutProps) {
+export default function DashboardLayout({children, colleague}: DashboardLayoutProps) {
     const router = useRouter();
 
     const menuItems: ItemType[] = [{
@@ -28,7 +27,7 @@ export default function DashboardLayout({children, user}: DashboardLayoutProps) 
             router.push('/')
         }
     },
-        (user?.roles_id === 1 || user?.roles_id === 2) ? {
+        (colleague?.roles_id === 1 || colleague?.roles_id === 2) ? {
         key: '2',
         label: 'Collega\'s',
         icon: <UserOutlined/>,
@@ -46,7 +45,6 @@ export default function DashboardLayout({children, user}: DashboardLayoutProps) 
                 </div>
                 <div className={'w-44 mt-2'}>
                     <LogoutPage />
-                    <LoginPage />
                 </div>
             </Header>
             <Layout>
@@ -66,6 +64,7 @@ export default function DashboardLayout({children, user}: DashboardLayoutProps) 
                             padding: 24,
                             margin: 0,
                             minHeight: 280,
+                            overflow: "scroll"
                         }}
                     >
                         {children}

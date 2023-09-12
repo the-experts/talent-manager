@@ -1,5 +1,5 @@
 import axios from "axios";
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 
 export function useAllCategories () {
 
@@ -18,6 +18,14 @@ export function useAllCategories () {
 }
 
 export type Category = {
-    id: string;
+    id: number;
     name: string;
+}
+
+export type CategorySelectItem = {
+    disabled?: boolean,
+    key?: React.Key,
+    label?: string;
+    title?: string;
+    value?: number;
 }

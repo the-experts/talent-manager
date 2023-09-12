@@ -15,8 +15,8 @@ CREATE TABLE "colleagues" (
 CREATE TABLE "roles" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
-    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" TIMESTAMP(3) NOT NULL,
+    "created_at" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3),
 
     CONSTRAINT "roles_pkey" PRIMARY KEY ("id")
 );
@@ -25,8 +25,8 @@ CREATE TABLE "roles" (
 CREATE TABLE "skills" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
-    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" TIMESTAMP(3) NOT NULL,
+    "created_at" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3),
     "categories_id" INTEGER NOT NULL,
 
     CONSTRAINT "skills_pkey" PRIMARY KEY ("id")
@@ -37,9 +37,10 @@ CREATE TABLE "colleagues_skills" (
     "id" SERIAL NOT NULL,
     "colleague_id" INTEGER NOT NULL,
     "skill_id" INTEGER NOT NULL,
+    "category_id" INTEGER NOT NULL,
     "ability" INTEGER NOT NULL,
     "interest" INTEGER NOT NULL,
-    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "created_at" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3),
 
     CONSTRAINT "colleagues_skills_pkey" PRIMARY KEY ("id")
