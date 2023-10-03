@@ -79,8 +79,6 @@ const EditableCell: React.FC<EditableCellProps> = ({
     // @ts-ignore
     const node = children[1];
     let itemToShow = node;
-    console.log('record', record);
-    console.log('displayCategory', displayCategory);
 
     if (displayCategory === 0 && record?.category_id) {
         const foundCategory = categories?.find(category => category.id === record.category_id);
@@ -284,8 +282,6 @@ const SkillList = (props: any) => {
                     skill_id
                 };
 
-                console.log('editedItem', editedItem)
-
                 // create new skill, then new colleague-skill entry
                 if (editedItem.skill_id === undefined && editedItem.id === undefined) {
                     const category = editedItem.category.value || editedItem.categories_id;
@@ -333,9 +329,6 @@ const SkillList = (props: any) => {
                 else if (editedItem?.skill_id && editedItem?.id === undefined) {
                     await saveColleagueSkill(editedItem?.skill_id, editedItem).then((response) => {
                         const newItem = response?.data?.addSkillToColleagueQuery?.rows ? response?.data?.addSkillToColleagueQuery?.rows[0] : undefined;
-                        console.log("response?.data", response?.data)
-                        console.log('updatedCurrentColleagueSkills', updatedCurrentColleagueSkills);
-                        console.log('newItem', newItem);
                         if (newItem) {
                             const updatedIndex = updatedCurrentColleagueSkills.findIndex((colleagueSkillItem: ColleagueSkillItem) => (colleagueSkillItem.id === newItem.id));
                             if (updatedIndex) {
@@ -435,22 +428,39 @@ const SkillList = (props: any) => {
                         </Popconfirm>
                     </span>
                 ) : ( !editable && recordKey ? (
-                    <Typography.Link disabled={editingKey !== ''} onClick={() => edit({...record, key: recordKey})}>
-                        Edit
-                    </Typography.Link>
+                    <>
+                        <Typography.Link disabled={editingKey !== ''} onClick={() => edit({...record, key: recordKey})}>
+                            Edit
+                        </Typography.Link>
+                        {' '}
+                        <Typography.Link disabled={editingKey !== ''} onClick={() => handleDelete(recordKey)}>
+                            Delete
+                        </Typography.Link>
+                    </>
                 ) : null
                 );
             },
         },
     ];
 
-    const handleDelete = (key: React.Key|undefined) => {
+    const handleDelete = async (key: React.Key | undefined) => {
         if (key === undefined) {
             setCurrentColleagueSkills(currentColleagueSkills);
             return;
         }
+        const itemToBeDeleted = currentColleagueSkills.find(item => (item.key === key));
         const newData = currentColleagueSkills.filter(item => item.key !== key);
         setCurrentColleagueSkills(newData);
+
+        if (itemToBeDeleted?.id) {
+            const colleagueSkillId = itemToBeDeleted?.id;
+            return await axios.post('/api/delete-colleague-skill', {colleagueSkillId})
+                .then(response => {
+                    return response;
+            }).catch(error => {
+                console.error('deleting colleague-skill failed: ', error);
+            })
+        }
     };
 
     const handleAdd = () => {
