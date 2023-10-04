@@ -1,8 +1,8 @@
 import {useEffect, useState} from "react";
 import axios from "axios";
-import {ColleagueSkillItem} from "@/app/SkillList";
+import {ColleagueSkillItem, SkillItem} from "@/app/SkillList";
 
-export function useFetchAllSkills(): Skill[] {
+export function useFetchAllSkills(): SkillItem[] {
     const [allSkills, setAllSkills] = useState([]);
 
     useEffect(() => {
@@ -27,7 +27,7 @@ export function useFetchAllSkills(): Skill[] {
     return allSkills;
 }
 
-export function useFetchColleagueSkills(colleagueId: number): Skill[]|null {
+export function useFetchColleagueSkills(colleagueId: number): ColleagueSkillItem[]|null {
     const [userSkills, setUserSkills] = useState([]);
 
     useEffect(() => {
@@ -54,11 +54,5 @@ export function useFetchColleagueSkills(colleagueId: number): Skill[]|null {
     }, [colleagueId]);
 
     return userSkills;
-}
-
-export type Skill = {
-    id: number;
-    name: string;
-    categories_id: number;
 }
 
