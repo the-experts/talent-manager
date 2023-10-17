@@ -7,7 +7,6 @@ export default async function handler(
 ) {
     try {
         const skillToEdit = request.body.skillForColleague;
-        console.log('skillToEdit', skillToEdit)
 
         if (!skillToEdit) throw new Error('Skill data is required');
         const editColleagueSkillQuery = await sql`UPDATE colleagues_skills 
@@ -17,7 +16,7 @@ export default async function handler(
                                                                              ability = ${skillToEdit.ability},
                                                                              colleague_id = ${skillToEdit.colleague_id}
                                                                             WHERE id = ${skillToEdit.id}
-                                                                            RETURNING *
+                                                                            RETURNING id, skill_id, category_id, interest, ability
                                                                             ;`;
         return response.status(200).json({ editColleagueSkillQuery });
     } catch (error) {

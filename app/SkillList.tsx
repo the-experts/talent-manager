@@ -17,6 +17,7 @@ export interface ColleagueSkillItem {
     name?: string;
     category_id?: number;
     category?: CategorySelectItem;
+    categoryName?: string;
 }
 
 export interface SkillItem {
@@ -56,7 +57,9 @@ interface EditableCellProps {
     inputType: string,
     index: number,
     key: string,
-    form: FormInstance
+    form: FormInstance,
+    categoryName: string,
+    newSkillName: string
 }
 
 const EditableCell: React.FC<EditableCellProps> = ({
@@ -71,19 +74,17 @@ const EditableCell: React.FC<EditableCellProps> = ({
            colleagueSkills,
            children,
            form,
+           categoryName,
+           newSkillName,
            ...restProps
        }) => {
-    const [displayCategory, setDisplayCategory] = useState<number>(0);
-    const [displaySkill, setDisplaySkill] = useState<string>('');
+    let displayCategory;
+    let displaySkill;
+    let inputNode;
 
     // @ts-ignore
     const node = children[1];
     let itemToShow = node;
-
-    if (displayCategory === 0 && record?.category_id) {
-        const foundCategory = categories?.find(category => category.id === record.category_id);
-        itemToShow = foundCategory?.name;
-    }
 
     const items = categories?.map((category) => {
         return {
@@ -91,7 +92,6 @@ const EditableCell: React.FC<EditableCellProps> = ({
             value: category?.id
         }
     });
-
     const transformedSkills = allSkills?.map((skill: SkillItem) => (
         {
             key: skill.id,
@@ -101,11 +101,35 @@ const EditableCell: React.FC<EditableCellProps> = ({
         }
     )) as DefaultOptionType[];
 
+    if (record?.category?.title) {
+        displayCategory = record?.category?.title;
+    } else if (record?.category_id) {
+        const foundCategory = categories?.find(category => category.id === record.category_id);
+        if (foundCategory) {
+            displayCategory = foundCategory?.name;
+        }
+    }
+
+    if (node === '' || node === undefined) {
+        if (record?.skill_id && allSkills.length > -1) {
+            const findExistingSkill = allSkills?.find((skill) => skill?.id === record?.skill_id);
+            if (findExistingSkill) {
+                itemToShow = findExistingSkill?.name;
+            }
+        } else {
+            itemToShow = displaySkill;
+        }
+    }
+
+    if (node === null) {
+        itemToShow = displayCategory ?? record?.category?.title;
+    }
+
     const handleSelectChange = (event: any) => {
         const foundDisplayCategory = categories.find(category => category.name === event.label);
 
         if (foundDisplayCategory) {
-            itemToShow = foundDisplayCategory.name;
+            displayCategory = foundDisplayCategory.name;
         }
     }
 
@@ -114,15 +138,18 @@ const EditableCell: React.FC<EditableCellProps> = ({
             const findExistingSkill = allSkills.find((skill) => skill?.name === event);
 
             if (findExistingSkill) {
-                setDisplaySkill(findExistingSkill?.name ?? '');
+                form.setFieldValue('name',findExistingSkill.name ?? '');
+                displaySkill = findExistingSkill.name;
             }
         }
     }
 
-    let inputNode;
+    const handleBlur = (event: any) => {
+        displaySkill = event?.target?.value ?? undefined;
+    }
 
     if (inputType === 'number') {
-        inputNode = <InputNumber min={1} max={5} />
+        inputNode = <InputNumber min={0} max={5} />
     } else if (inputType === 'select') {
         inputNode = <Select
             labelInValue
@@ -135,6 +162,7 @@ const EditableCell: React.FC<EditableCellProps> = ({
             className='width-200'
             options={transformedSkills}
             onSelect={handleAutoCompleteSelect}
+            onBlur={handleBlur}
             placeholder="Type to search for a skill"
             filterOption={(inputValue, option) =>
                 option?.label?.toString().toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
@@ -142,11 +170,7 @@ const EditableCell: React.FC<EditableCellProps> = ({
         /> : record.name
     }
 
-    if (node === '') {
-        itemToShow = displaySkill;
-    }
-
-    return (node !== undefined && node !== '') ? (
+    return (node !== undefined && node !== null && node !== '') ? (
         <td {...restProps}>
             {editing ? (
                 <Form.Item
@@ -183,23 +207,36 @@ const EditableCell: React.FC<EditableCellProps> = ({
         </td>
 };
 
-const SkillList = (props: any) => {
+const SkillList = ({addDataToFirstTab, updateDataInFirstTab, deleteCsiFromFirstTab, addNewSkillToAllSkillsArray, ...props}: any) => {
     const [form] = Form.useForm();
     const [editingKey, setEditingKey] = useState<string|number>('');
+    const [newSkillName, setNewSkillName] = useState<string>();
 
     const isEditing = (record: ColleagueSkillItem) => record.key === editingKey;
     const colleagueId = props.colleagueId;
     const colleagueSkills = props.colleagueSkills;
 
     const dbSkills: ColleagueSkillItem[] = [];
-    const [currentColleagueSkills, setCurrentColleagueSkills] = useState<ColleagueSkillItem[]>([]);
+    let [currentColleagueSkills, setCurrentColleagueSkills] = useState<ColleagueSkillItem[]>([]);
+    let categoryName: string;
+    let displaySkill: string;
 
     props?.colleagueSkills?.forEach((existingColleagueSkill: ColleagueSkillItem) => {
+        if (props?.categories && existingColleagueSkill?.category_id) {
+            const foundCategory = props.categories?.find((category: Category) => (category.id === existingColleagueSkill?.category_id));
+            categoryName = foundCategory?.name ?? '';
+        }
+
         const newData: ColleagueSkillItem = {
             id: existingColleagueSkill.id,
             key: dbSkills?.length +1,
             colleague_id: existingColleagueSkill.colleague_id,
             category_id: existingColleagueSkill?.category_id,
+            category: {
+                title: categoryName,
+                label: categoryName,
+                value: existingColleagueSkill.category_id
+            },
             skill_id: existingColleagueSkill.skill_id,
             ability: existingColleagueSkill.ability,
             interest: existingColleagueSkill.interest,
@@ -207,7 +244,6 @@ const SkillList = (props: any) => {
         };
         dbSkills.push(newData);
     });
-
 
     useEffect(() => {
         setCurrentColleagueSkills(dbSkills);
@@ -227,12 +263,12 @@ const SkillList = (props: any) => {
         setEditingKey('');
     };
 
-    const saveColleagueSkill = async (skillId: number, editedItem: EditedItem, isEditing = false): Promise<any> => {
+    const saveColleagueSkillItem = async (skillId: number, editedItem: EditedItem, isEditing = false): Promise<any> => {
         const url = isEditing ? '/api/edit-colleague-skill' : '/api/add-skill-to-colleague';
         const body = isEditing ? {
             id: editedItem?.id,
             skill_id: skillId,
-            category_id: editedItem?.category?.value ?? editedItem?.categories_id,
+            category_id: editedItem?.category?.value,
             ability: editedItem?.ability,
             interest: editedItem?.interest,
             colleague_id: editedItem?.colleague_id,
@@ -253,148 +289,189 @@ const SkillList = (props: any) => {
         })
     }
 
+    const saveNewColleagueSkillItem = async (newSkillResponseId: number, index: number, updatedCurrentColleagueSkills: ColleagueSkillItem[], editedItem: EditedItem) => {
+        updatedCurrentColleagueSkills.splice(index, 1, {
+            ...editedItem,
+            skill_id: newSkillResponseId
+        });
+
+        const response = await saveColleagueSkillItem(newSkillResponseId, {
+            ...editedItem,
+            skill_id: newSkillResponseId
+        }).catch((error) => {
+            console.error('failed saving new colleague-skill-item with existing skill:', error)
+        });
+
+        const newCsiResponseItem = response?.data?.addSkillToColleagueQuery?.rows ? response?.data?.addSkillToColleagueQuery?.rows[0] : undefined;
+
+        if (!newCsiResponseItem) {
+            throw new Error('new colleague-skill-item could not be retrieved from server');
+        }
+
+        const updatedIndex = updatedCurrentColleagueSkills.findIndex((colleagueSkillItem: ColleagueSkillItem) => (colleagueSkillItem.id === newCsiResponseItem.id));
+        if (updatedIndex) {
+            let newCsi = {
+                ...updatedCurrentColleagueSkills[updatedIndex],
+                ability: newCsiResponseItem.ability,
+                interest: newCsiResponseItem.interest,
+                category: editedItem.category,
+                category_id: editedItem?.category?.value,
+                skill_id: newCsiResponseItem.skill_id
+            }
+            updatedCurrentColleagueSkills[updatedIndex] = newCsi;
+
+            setCurrentColleagueSkills(updatedCurrentColleagueSkills);
+            updateDataInFirstTab(newCsi);
+
+            return updatedCurrentColleagueSkills;
+        }
+    };
+
+    const editColleagueSkillItem = async (editedItem: EditedItem, updatedCurrentColleagueSkills: ColleagueSkillItem[]) => {
+        if (!editedItem.skill_id) {
+            return;
+        }
+        await saveColleagueSkillItem(editedItem.skill_id, editedItem, true)
+            .then((response) => {
+                const updatedItem = response?.data?.editColleagueSkillQuery?.rows ? response?.data?.editColleagueSkillQuery?.rows[0] : undefined;
+                if (!updatedItem) {
+                    return;
+                }
+                    const updatedIndex = updatedCurrentColleagueSkills.findIndex((colleagueSkillItem: ColleagueSkillItem) => (colleagueSkillItem.id === updatedItem.id));
+                    const foundCategory = props.categories?.find((category: Category) => (category.id === editedItem?.category?.value));
+
+                    if (updatedIndex > -1) {
+                        let updatedCsi = {
+                            ...updatedCurrentColleagueSkills[updatedIndex],
+                            ability: updatedItem.ability,
+                            interest: updatedItem.interest,
+                            category_id: editedItem.category?.value,
+                            category: {
+                                label: foundCategory?.name,
+                                title: foundCategory?.name,
+                                value: editedItem.category.value
+                            },
+                            skill_id: updatedItem.skill_id
+                        }
+
+                        updatedCurrentColleagueSkills[updatedIndex] = updatedCsi;
+
+                        setCurrentColleagueSkills(updatedCurrentColleagueSkills);
+                        updateDataInFirstTab(updatedCsi);
+                    }
+            }).catch((error) => {
+                console.error('failed editing existing colleague-skill-item:', error);
+            });
+
+        return updatedCurrentColleagueSkills;
+    };
+
     const save = async (key: React.Key) => {
         try {
-            const row = (await form.validateFields()) as ColleagueSkillItem;
             const updatedCurrentColleagueSkills = [...currentColleagueSkills];
             const index = updatedCurrentColleagueSkills.findIndex(item => key === item.key);
+            const row = (await form.validateFields()) as ColleagueSkillItem;
+            const categoryId = row.category?.value ?? props?.categoryId;
+            let categoryName = '';
+            let skill_id;
+
+            if (categoryId) {
+                const foundCategory = props.categories?.find((category: Category) => (category.id === categoryId));
+                categoryName = foundCategory?.name ?? '';
+            }
+
+            const item = {
+                ...updatedCurrentColleagueSkills[index],
+                ...row,
+                category: row.category?.value ?? props?.categoryId
+            };
 
             if (index > -1) {
                 // editing existing item by replacing the old data with the new
-                const item = updatedCurrentColleagueSkills[index];
-
-                let skill_id;
-
-                if (row?.name) {
-                    const matchingSkill = props.allSkills.find((allSkillItem: SkillItem) => allSkillItem.name === row.name);
-                    skill_id = matchingSkill.id;
-                } else if (item.skill_id) {
-                    skill_id = item.skill_id;
-                }
-
-                const editedItem: EditedItem = {
-                    ...item,
-                    ...row,
-                    category: {
-                        ...row.category,
-                        title: row?.category?.label
-                    },
-                    skill_id
-                };
-
-                // create new skill, then new colleague-skill entry
-                if (editedItem.skill_id === undefined && editedItem.id === undefined) {
-                    const category = editedItem.category.value || editedItem.categories_id;
-                    if (!(category && editedItem.name)) {
-                        return;
-                    }
-
-                    // save skill and return skill_id
-                    await axios.post('/api/create-skill', {
-                        newSkill: {
-                            categories_id: editedItem.category.value,
-                            name: editedItem.name
-                        } ?? null
-                    }).then(async (response) => {
-                        const newSkill = response?.data?.createSkillQuery?.rows[0];
-                        updatedCurrentColleagueSkills.splice(index, 1, {
-                            ...editedItem,
-                            skill_id: newSkill?.id
-                        });
-
-                        // new skill successfully created, adding new colleague-skill-item
-                        if (newSkill?.id && editedItem?.colleague_id) {
-                            const response = await saveColleagueSkill(newSkill?.skill_id, editedItem);
-                            const newItem = response?.data?.addSkillToColleagueQuery?.rows ? response?.data?.addSkillToColleagueQuery?.rows[0] : undefined;
-                            if (newItem) {
-                                const updatedIndex = updatedCurrentColleagueSkills.findIndex((colleagueSkillItem: ColleagueSkillItem) => (colleagueSkillItem.id === newItem.id));
-                                if (updatedIndex) {
-                                    updatedCurrentColleagueSkills[updatedIndex] = {
-                                        ...updatedCurrentColleagueSkills[updatedIndex],
-                                        ability: newItem.ability,
-                                        interest: newItem.interest,
-                                        category_id: newItem.category_id,
-                                        skill_id: newItem.skill_id
-                                    }
-                                }
-                            }
-                        }
-                    }).catch((error) => {
-                        console.error('saving new skill failed: ',error)
-                        const modifiedSkillList = currentColleagueSkills.slice(0, -1);
-                        setCurrentColleagueSkills(modifiedSkillList);
-                    })
-                }
-                // skill already exists, colleagueSkillItem is being newly created
-                else if (editedItem?.skill_id && editedItem?.id === undefined) {
-                    await saveColleagueSkill(editedItem?.skill_id, editedItem).then((response) => {
-                        const newItem = response?.data?.addSkillToColleagueQuery?.rows ? response?.data?.addSkillToColleagueQuery?.rows[0] : undefined;
-                        if (newItem) {
-                            const updatedIndex = updatedCurrentColleagueSkills.findIndex((colleagueSkillItem: ColleagueSkillItem) => (colleagueSkillItem.id === newItem.id));
-                            if (updatedIndex) {
-                                updatedCurrentColleagueSkills[updatedIndex] = {
-                                    ...updatedCurrentColleagueSkills[updatedIndex],
-                                    ability: newItem.ability,
-                                    interest: newItem.interest,
-                                    category_id: newItem.category_id,
-                                    skill_id: newItem.skill_id
-                                }
-                            }
-                            setCurrentColleagueSkills(updatedCurrentColleagueSkills);
-                        }
-                    }).catch((error) => {
-                        console.error('failed saving new colleague-skill-item with existing skill:', error)
-                    });
-                }
-                // skill id already defined, edit existing entry
-                else if (editedItem?.skill_id && editedItem?.id) {
-                    await saveColleagueSkill(editedItem?.skill_id, editedItem, true)
-                        .then((response) => {
-                            const updatedItem = response?.data?.editColleagueSkillQuery?.rows ? response?.data?.editColleagueSkillQuery?.rows[0] : undefined;
-
-                            if (updatedItem) {
-                                const updatedIndex = updatedCurrentColleagueSkills.findIndex((colleagueSkillItem: ColleagueSkillItem) => (colleagueSkillItem.id === updatedItem.id));
-
-                                if (updatedIndex > -1) {
-                                    updatedCurrentColleagueSkills[updatedIndex] = {
-                                        ...updatedCurrentColleagueSkills[updatedIndex],
-                                        ability: updatedItem.ability,
-                                        interest: updatedItem.interest,
-                                        category_id: updatedItem.category_id,
-                                        skill_id: updatedItem.skill_id
-                                    }
-
-                                    setCurrentColleagueSkills(updatedCurrentColleagueSkills);
-                                }
-                            }
-                        }).catch((error) => {
-                            console.error('failed editing existing colleague-skill-item:', error);
-                        });
-                }
-
-                setEditingKey('');
+                updatedCurrentColleagueSkills[index] = item;
             } else {
                 // adding new row
-                updatedCurrentColleagueSkills.push(row);
-                setCurrentColleagueSkills(updatedCurrentColleagueSkills);
-                setEditingKey('');
+                updatedCurrentColleagueSkills.push(item);
             }
+
+            if (row?.name) {
+                const matchingSkill = props.allSkills.find((allSkillItem: SkillItem) => allSkillItem.name === row.name);
+                skill_id = matchingSkill?.id;
+            } else if (item.skill_id) {
+                skill_id = item.skill_id;
+            }
+
+            const editedItem: EditedItem = {
+                ...item,
+                ...row,
+                category: {
+                    value: categoryId,
+                    title: categoryName
+                },
+                skill_id
+            };
+
+            // create new skill, then new colleague-skill entry
+            if (editedItem.skill_id === undefined && editedItem.id === undefined) {
+                if (!(editedItem?.category?.value && editedItem.name)) {
+                    console.error('category or skill not set');
+                    return;
+                }
+
+                const newSkill = {
+                    categories_id: editedItem.category.value,
+                    name: editedItem.name
+                };
+
+                 await axios.post('/api/create-skill', {newSkill})
+                    .then(async (response) => {
+                        const newSkillResponse = response?.data?.createSkillQuery?.rows[0];
+                        displaySkill = newSkillResponse?.name;
+                        setNewSkillName(displaySkill);
+                        if (!newSkillResponse) {
+                            throw new Error('new skill not saved')
+                        }
+                        const updatedColleagueSkillItems = await saveNewColleagueSkillItem(newSkillResponse.id, index, updatedCurrentColleagueSkills, editedItem)
+                        updatedColleagueSkillItems ? (currentColleagueSkills = updatedColleagueSkillItems) : null;
+                        const newSkill = {
+                            id: newSkillResponse.id,
+                            name: newSkillResponse.name,
+                            categories_id: newSkillResponse.categories_id
+                        };
+
+                        addNewSkillToAllSkillsArray(newSkill);
+                    })
+                     .catch(({ error }) => {
+                         console.error(error);
+                     })
+            }
+            // skill already exists, colleagueSkillItem is being newly created
+            else if (editedItem?.skill_id && editedItem?.id === undefined) {
+                await saveNewColleagueSkillItem(editedItem.skill_id, index, updatedCurrentColleagueSkills, editedItem)
+            }
+            // skill id and item id already defined, edit existing entry
+            else if (editedItem?.skill_id && editedItem?.id) {
+                const updatedColleagueSkillItems = await editColleagueSkillItem(editedItem, updatedCurrentColleagueSkills);
+                updatedColleagueSkillItems ? (currentColleagueSkills = updatedColleagueSkillItems) : null;
+            }
+            setEditingKey('');
         } catch (errInfo) {
             console.error('Validate Failed:', errInfo);
         }
     };
 
-    const defaultColumns: (ColumnTypes[number] & { editable?: boolean; dataIndex: string })[] = [
+    const categoryColumn = {
+        title: 'Category',
+        dataIndex: 'category',
+        width: '20%',
+        editable: true,
+    };
+
+    const defaultColumns: (ColumnTypes[number] & { editable?: boolean; dataIndex: string }|null)[] = [
         {
             title: 'Skill',
             dataIndex: 'name',
             width: '25%',
-            editable: true,
-        },
-        {
-            title: 'Category',
-            dataIndex: 'category',
-            width: '20%',
             editable: true,
         },
         {
@@ -443,19 +520,24 @@ const SkillList = (props: any) => {
         },
     ];
 
+    // show category column only at 'All' tab
+    if (props?.showCategoryColumn === true) {
+        defaultColumns.splice(1,0, categoryColumn);
+    }
+
     const handleDelete = async (key: React.Key | undefined) => {
         if (key === undefined) {
             setCurrentColleagueSkills(currentColleagueSkills);
             return;
         }
         const itemToBeDeleted = currentColleagueSkills.find(item => (item.key === key));
-        const newData = currentColleagueSkills.filter(item => item.key !== key);
-        setCurrentColleagueSkills(newData);
-
         if (itemToBeDeleted?.id) {
             const colleagueSkillId = itemToBeDeleted?.id;
             return await axios.post('/api/delete-colleague-skill', {colleagueSkillId})
                 .then(response => {
+                    const newData = currentColleagueSkills.filter(item => item.key !== key);
+                    setCurrentColleagueSkills(newData);
+                    deleteCsiFromFirstTab(itemToBeDeleted?.id);
                     return response;
             }).catch(error => {
                 console.error('deleting colleague-skill failed: ', error);
@@ -466,7 +548,7 @@ const SkillList = (props: any) => {
     const handleAdd = () => {
         const newData: Partial<ColleagueSkillItem> = {
             id: undefined,
-            key: dbSkills.length +1,
+            key: currentColleagueSkills?.length +1,
             colleague_id: colleagueId,
             category: undefined,
             skill_id: undefined,
@@ -476,6 +558,11 @@ const SkillList = (props: any) => {
         };
         setCurrentColleagueSkills([...currentColleagueSkills, newData]);
         edit(newData as Partial<ColleagueSkillItem> & { key: React.Key });
+
+        // wait for antd to finish rendering the newly added row, then scroll to the bottom
+        setTimeout(() => {
+            document.querySelector('tr[data-row-key]:last-of-type')?.scrollIntoView({behavior: "smooth", block: "end" })
+        }, 10);
     };
 
     const getInputType = (dataIndex: string) => {
@@ -483,13 +570,13 @@ const SkillList = (props: any) => {
             return 'number';
         } else if (dataIndex === 'category') {
             return 'select';
-        } else {
+        } else if (dataIndex !== null) {
             return 'autocomplete';
         }
     }
 
     const columns = defaultColumns.map(col => {
-        if (!col.editable) {
+        if (!col?.editable) {
             return col;
         }
 
@@ -506,7 +593,9 @@ const SkillList = (props: any) => {
                 allSkills: props.allSkills,
                 colleagueSkills,
                 form,
+                categoryName: record.categoryName,
                 key: col.dataIndex,
+                newSkillName
             }),
         };
     });
@@ -522,6 +611,7 @@ const SkillList = (props: any) => {
                         cell: EditableCell
                     },
                 }}
+                pagination={false}
                 rowClassName={() => 'editable-row'}
                 bordered
                 dataSource={currentColleagueSkills}
