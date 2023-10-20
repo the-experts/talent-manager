@@ -1,10 +1,11 @@
 'use client';
 
 import React, {Fragment, useEffect, useState} from "react";
-import { Tab } from "@headlessui/react";
+import {Tab} from "@headlessui/react";
 import {Category, useAllCategories} from "@/app/hooks/categories";
 import SkillList, {ColleagueSkillItem, SkillItem} from "@/app/SkillList";
 import {useFetchAllSkills, useFetchColleagueSkills} from "@/app/hooks/skills";
+import {undefined} from "zod";
 
 const Skills = (props: any) => {
     const categories: Category[] = useAllCategories();
@@ -36,13 +37,39 @@ const Skills = (props: any) => {
         }
     }, [props?.colleagueId, fetchedColleagueSkills]);
 
-    // @todo: update data in tabs when change is made in 'all'
-    const updateCsiItems = (updatedColleagueSkillItemFromCategoryTab: ColleagueSkillItem) => {
+    const updateCsiItems = (updatedColleagueSkillItemFromCategoryTab: ColleagueSkillItem, originalCategoryId: number|undefined) => {
         if (!updatedColleagueSkillItemFromCategoryTab || !allColleagueSkillItems?.length) {
             return;
         }
         const foundIndexOfUpdatedItem = allColleagueSkillItems?.findIndex((csi) => (csi.id === updatedColleagueSkillItemFromCategoryTab.id));
         const colleagueSkillsCopy = [...allColleagueSkillItems];
+
+        if (updatedColleagueSkillItemFromCategoryTab.category_id) {
+            switch (updatedColleagueSkillItemFromCategoryTab.category_id) {
+                case 1:
+                    const techniqueColleagueSkillItemsCopy = [...techniqueColleagueSkillItems];
+                    updateTabbedItems(updatedColleagueSkillItemFromCategoryTab, techniqueColleagueSkillItemsCopy, originalCategoryId);
+                    return;
+                case 2:
+                    const toolColleagueSkillItemsCopy = [...toolColleagueSkillItems];
+                    updateTabbedItems(updatedColleagueSkillItemFromCategoryTab, toolColleagueSkillItemsCopy, originalCategoryId);
+                    return;
+                case 3:
+                    const platformColleagueSkillItemsCopy = [...toolColleagueSkillItems];
+                    updateTabbedItems(updatedColleagueSkillItemFromCategoryTab, platformColleagueSkillItemsCopy, originalCategoryId);
+                    return;
+                case 4:
+                    const languageColleagueSkillItemsCopy = [...languageColleagueSkillItems];
+                    updateTabbedItems(updatedColleagueSkillItemFromCategoryTab, languageColleagueSkillItemsCopy, originalCategoryId);
+                    return;
+                case 9:
+                    const otherColleagueSkillItemsCopy = [...otherColleagueSkillItems];
+                    updateTabbedItems(updatedColleagueSkillItemFromCategoryTab, otherColleagueSkillItemsCopy, originalCategoryId);
+                    return;
+                default:
+                    return;
+            }
+        }
 
         // updating existing csi
         if (foundIndexOfUpdatedItem > -1) {
@@ -53,12 +80,120 @@ const Skills = (props: any) => {
         setAllColleagueSkillItems(colleagueSkillsCopy);
     };
 
+    const updateTabbedItems = (updatedColleagueSkillItem: ColleagueSkillItem, categoryListItemsForUpdatedCategoryValue: ColleagueSkillItem[], originalCategoryId: number|undefined) => {
+        // only ability or interest was updated
+        if (updatedColleagueSkillItem?.category_id &&
+            (updatedColleagueSkillItem?.category_id === originalCategoryId)
+        ) {
+            return updateAbilityInterestValues(updatedColleagueSkillItem, categoryListItemsForUpdatedCategoryValue, updatedColleagueSkillItem.category_id)
+        } // category (and potentially ability and interest) was changed
+        else if (
+            originalCategoryId &&
+            updatedColleagueSkillItem?.category_id &&
+            (updatedColleagueSkillItem?.category_id !== originalCategoryId)
+        ) {
+            return updateCategoryAbilityInterestOnColleagueSkillItem(originalCategoryId, updatedColleagueSkillItem);
+        }
+
+        return categoryListItemsForUpdatedCategoryValue;
+    };
+
+    const updateAbilityInterestValues = (updatedCsItemFromCategoryTab: ColleagueSkillItem, categoryListItemsForUpdatedCategoryValue: ColleagueSkillItem[], categoryId: number) => {
+        const updatedItemIndex = categoryListItemsForUpdatedCategoryValue.findIndex(item => (item.id === updatedCsItemFromCategoryTab.id));
+        if (updatedItemIndex < 0) {
+            return categoryListItemsForUpdatedCategoryValue;
+        }
+
+        categoryListItemsForUpdatedCategoryValue[updatedItemIndex] = {
+            ...categoryListItemsForUpdatedCategoryValue[updatedItemIndex],
+            ability: updatedCsItemFromCategoryTab.ability,
+            interest: updatedCsItemFromCategoryTab.interest
+        }
+        updateTabState(categoryId, categoryListItemsForUpdatedCategoryValue);
+        return categoryListItemsForUpdatedCategoryValue;
+    };
+
+    const updateCategoryAbilityInterestOnColleagueSkillItem = (previousCategoryId: number, updatedColleagueSkillItem: ColleagueSkillItem)  => {
+        if (!previousCategoryId || !updatedColleagueSkillItem?.category_id) {
+            return [];
+        }
+
+        const updatedColleagueSkillItemId = updatedColleagueSkillItem.id;
+        const colleagueSkillItemsPreviousCategory = getCategorizedColleagueSkillItemsByCategoryId(previousCategoryId);
+
+        // remove item from previous category array
+        const updatedColleagueSkillItemsPreviousCategory = colleagueSkillItemsPreviousCategory?.filter(csItem => csItem.id !== updatedColleagueSkillItemId);
+        updateTabState(previousCategoryId, updatedColleagueSkillItemsPreviousCategory);
+
+        // add to new one, with updated values for category, ability, interest
+        const categoryIdUpdated: number = updatedColleagueSkillItem.category_id as number;
+        const colleagueSkillItemsNewCategory = getCategorizedColleagueSkillItemsByCategoryId(categoryIdUpdated);
+        const indexOfItemToBeUpdated = colleagueSkillItemsNewCategory.findIndex(csItem => csItem.id === updatedColleagueSkillItem.id);
+
+        if (indexOfItemToBeUpdated < 0) {
+            colleagueSkillItemsNewCategory.push(updatedColleagueSkillItem);
+        } else {
+            colleagueSkillItemsNewCategory[indexOfItemToBeUpdated] = {
+                ...updatedColleagueSkillItem
+            }
+        }
+
+        updateTabState(categoryIdUpdated, colleagueSkillItemsNewCategory);
+    };
+
+    const getCategorizedColleagueSkillItemsByCategoryId = (categoryId: number) => {
+        switch (categoryId) {
+            case 1:
+                return [...techniqueColleagueSkillItems];
+            case 2:
+                return [...toolColleagueSkillItems];
+            case 3:
+                return [...toolColleagueSkillItems];
+            case 4:
+                return [...languageColleagueSkillItems];
+            case 9:
+                return [...otherColleagueSkillItems];
+            default:
+                return [];
+        }
+    };
+
+    const updateTabState = (categoryId: number, updatedCategoryTabItems: ColleagueSkillItem[])  => {
+        switch (categoryId) {
+            case 1:
+                setTechniqueColleagueSkillItems(updatedCategoryTabItems);
+                return;
+            case 2:
+                setToolColleagueSkillItems(updatedCategoryTabItems);
+                return;
+            case 3:
+                setPlatformColleagueSkillItems(updatedCategoryTabItems);
+                return;
+            case 4:
+                setLanguageColleagueSkillItems(updatedCategoryTabItems);
+                return;
+            case 9:
+                setOtherColleagueSkillItems(updatedCategoryTabItems);
+                return;
+            default:
+                return;
+        }
+    };
+
     const deleteCsiItem = (itemToBeDeletedId: number) => {
         if (!itemToBeDeletedId || !allColleagueSkillItems?.length) {
             return;
         }
+        const itemToBeDeleted = allColleagueSkillItems.find((allCsItem) => (allCsItem.id === itemToBeDeletedId));
         const updatedColleagueSkills = allColleagueSkillItems?.filter((csi) => (csi.id !== itemToBeDeletedId));
         setAllColleagueSkillItems(updatedColleagueSkills);
+
+        if (!itemToBeDeleted || !itemToBeDeleted?.category_id) {
+            return;
+        }
+        const categorizedCsItems = getCategorizedColleagueSkillItemsByCategoryId(itemToBeDeleted?.category_id);
+        const updatedCategorizedColleagueSkills = categorizedCsItems?.filter((categorizedCsItem) => (categorizedCsItem.id !== itemToBeDeletedId));
+        updateTabState(itemToBeDeleted?.category_id, updatedCategorizedColleagueSkills);
     };
 
     const addSkillToArray = (itemToBeAdded: SkillItem) => {
@@ -157,9 +292,9 @@ const Skills = (props: any) => {
                             colleagueSkills={allColleagueSkillItems}
                             categories={categories}
                             showCategoryColumn={true}
-                            addDataToFirstTab={updateCsiItems}
-                            updateDataInFirstTab={updateCsiItems}
-                            deleteCsiFromFirstTab={deleteCsiItem}
+                            categoryId={undefined}
+                            updateTabbedData={updateCsiItems}
+                            deleteCsiFromTabs={deleteCsiItem}
                             addNewSkillToAllSkillsArray={addSkillToArray}
                          />
                     </Tab.Panel>
@@ -170,9 +305,8 @@ const Skills = (props: any) => {
                             colleagueSkills={techniqueColleagueSkillItems}
                             categories={categories}
                             categoryId={1}
-                            addDataToFirstTab={updateCsiItems}
-                            updateDataInFirstTab={updateCsiItems}
-                            deleteCsiFromFirstTab={deleteCsiItem}
+                            updateTabbedData={updateCsiItems}
+                            deleteCsiFromTabs={deleteCsiItem}
                             addNewSkillToAllSkillsArray={addSkillToArray}
                         />
                     </Tab.Panel>
@@ -183,9 +317,8 @@ const Skills = (props: any) => {
                             colleagueSkills={toolColleagueSkillItems}
                             categories={categories}
                             categoryId={2}
-                            addDataToFirstTab={updateCsiItems}
-                            updateDataInFirstTab={updateCsiItems}
-                            deleteCsiFromFirstTab={deleteCsiItem}
+                            updateTabbedData={updateCsiItems}
+                            deleteCsiFromTabs={deleteCsiItem}
                             addNewSkillToAllSkillsArray={addSkillToArray}
                         />
                     </Tab.Panel>
@@ -196,9 +329,8 @@ const Skills = (props: any) => {
                             colleagueSkills={platformColleagueSkillItems}
                             categories={categories}
                             categoryId={3}
-                            addDataToFirstTab={updateCsiItems}
-                            updateDataInFirstTab={updateCsiItems}
-                            deleteCsiFromFirstTab={deleteCsiItem}
+                            updateTabbedData={updateCsiItems}
+                            deleteCsiFromTabs={deleteCsiItem}
                             addNewSkillToAllSkillsArray={addSkillToArray}
                         />
                     </Tab.Panel>
@@ -209,9 +341,8 @@ const Skills = (props: any) => {
                             colleagueSkills={languageColleagueSkillItems}
                             categories={categories}
                             categoryId={4}
-                            addDataToFirstTab={updateCsiItems}
-                            updateDataInFirstTab={updateCsiItems}
-                            deleteCsiFromFirstTab={deleteCsiItem}
+                            updateTabbedData={updateCsiItems}
+                            deleteCsiFromTabs={deleteCsiItem}
                             addNewSkillToAllSkillsArray={addSkillToArray}
                         />
                     </Tab.Panel>
@@ -222,9 +353,8 @@ const Skills = (props: any) => {
                             colleagueSkills={otherColleagueSkillItems}
                             categories={categories}
                             categoryId={9}
-                            addDataToFirstTab={updateCsiItems}
-                            updateDataInFirstTab={updateCsiItems}
-                            deleteCsiFromFirstTab={deleteCsiItem}
+                            updateTabbedData={updateCsiItems}
+                            deleteCsiFromTabs={deleteCsiItem}
                             addNewSkillToAllSkillsArray={addSkillToArray}
                         />
                     </Tab.Panel>

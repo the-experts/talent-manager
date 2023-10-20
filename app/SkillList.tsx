@@ -207,7 +207,7 @@ const EditableCell: React.FC<EditableCellProps> = ({
         </td>
 };
 
-const SkillList = ({addDataToFirstTab, updateDataInFirstTab, deleteCsiFromFirstTab, addNewSkillToAllSkillsArray, ...props}: any) => {
+const SkillList = ({updateTabbedData, deleteCsiFromTabs, addNewSkillToAllSkillsArray, ...props}: any) => {
     const [form] = Form.useForm();
     const [editingKey, setEditingKey] = useState<string|number>('');
     const [newSkillName, setNewSkillName] = useState<string>();
@@ -289,7 +289,7 @@ const SkillList = ({addDataToFirstTab, updateDataInFirstTab, deleteCsiFromFirstT
         })
     }
 
-    const saveNewColleagueSkillItem = async (newSkillResponseId: number, index: number, updatedCurrentColleagueSkills: ColleagueSkillItem[], editedItem: EditedItem) => {
+    const saveNewColleagueSkillItem = async (newSkillResponseId: number, index: number, updatedCurrentColleagueSkills: ColleagueSkillItem[], editedItem: EditedItem, originalCategoryId: number|undefined) => {
         updatedCurrentColleagueSkills.splice(index, 1, {
             ...editedItem,
             skill_id: newSkillResponseId
@@ -321,13 +321,13 @@ const SkillList = ({addDataToFirstTab, updateDataInFirstTab, deleteCsiFromFirstT
             updatedCurrentColleagueSkills[updatedIndex] = newCsi;
 
             setCurrentColleagueSkills(updatedCurrentColleagueSkills);
-            updateDataInFirstTab(newCsi);
+            updateTabbedData(newCsi, originalCategoryId);
 
             return updatedCurrentColleagueSkills;
         }
     };
 
-    const editColleagueSkillItem = async (editedItem: EditedItem, updatedCurrentColleagueSkills: ColleagueSkillItem[]) => {
+    const editColleagueSkillItem = async (editedItem: EditedItem, updatedCurrentColleagueSkills: ColleagueSkillItem[], originalCategoryId: number|undefined) => {
         if (!editedItem.skill_id) {
             return;
         }
@@ -357,7 +357,7 @@ const SkillList = ({addDataToFirstTab, updateDataInFirstTab, deleteCsiFromFirstT
                         updatedCurrentColleagueSkills[updatedIndex] = updatedCsi;
 
                         setCurrentColleagueSkills(updatedCurrentColleagueSkills);
-                        updateDataInFirstTab(updatedCsi);
+                        updateTabbedData(updatedCsi, originalCategoryId);
                     }
             }).catch((error) => {
                 console.error('failed editing existing colleague-skill-item:', error);
@@ -370,6 +370,12 @@ const SkillList = ({addDataToFirstTab, updateDataInFirstTab, deleteCsiFromFirstT
         try {
             const updatedCurrentColleagueSkills = [...currentColleagueSkills];
             const index = updatedCurrentColleagueSkills.findIndex(item => key === item.key);
+            let originalCategoryId: number|undefined;
+
+            if (updatedCurrentColleagueSkills[index]) {
+                originalCategoryId = updatedCurrentColleagueSkills[index]?.category_id ?? undefined;
+            }
+
             const row = (await form.validateFields()) as ColleagueSkillItem;
             const categoryId = row.category?.value ?? props?.categoryId;
             let categoryName = '';
@@ -431,7 +437,7 @@ const SkillList = ({addDataToFirstTab, updateDataInFirstTab, deleteCsiFromFirstT
                         if (!newSkillResponse) {
                             throw new Error('new skill not saved')
                         }
-                        const updatedColleagueSkillItems = await saveNewColleagueSkillItem(newSkillResponse.id, index, updatedCurrentColleagueSkills, editedItem)
+                        const updatedColleagueSkillItems = await saveNewColleagueSkillItem(newSkillResponse.id, index, updatedCurrentColleagueSkills, editedItem, originalCategoryId)
                         updatedColleagueSkillItems ? (currentColleagueSkills = updatedColleagueSkillItems) : null;
                         const newSkill = {
                             id: newSkillResponse.id,
@@ -447,11 +453,11 @@ const SkillList = ({addDataToFirstTab, updateDataInFirstTab, deleteCsiFromFirstT
             }
             // skill already exists, colleagueSkillItem is being newly created
             else if (editedItem?.skill_id && editedItem?.id === undefined) {
-                await saveNewColleagueSkillItem(editedItem.skill_id, index, updatedCurrentColleagueSkills, editedItem)
+                await saveNewColleagueSkillItem(editedItem.skill_id, index, updatedCurrentColleagueSkills, editedItem, originalCategoryId)
             }
             // skill id and item id already defined, edit existing entry
             else if (editedItem?.skill_id && editedItem?.id) {
-                const updatedColleagueSkillItems = await editColleagueSkillItem(editedItem, updatedCurrentColleagueSkills);
+                const updatedColleagueSkillItems = await editColleagueSkillItem(editedItem, updatedCurrentColleagueSkills, originalCategoryId);
                 updatedColleagueSkillItems ? (currentColleagueSkills = updatedColleagueSkillItems) : null;
             }
             setEditingKey('');
@@ -537,7 +543,7 @@ const SkillList = ({addDataToFirstTab, updateDataInFirstTab, deleteCsiFromFirstT
                 .then(response => {
                     const newData = currentColleagueSkills.filter(item => item.key !== key);
                     setCurrentColleagueSkills(newData);
-                    deleteCsiFromFirstTab(itemToBeDeleted?.id);
+                    deleteCsiFromTabs(itemToBeDeleted?.id);
                     return response;
             }).catch(error => {
                 console.error('deleting colleague-skill failed: ', error);
