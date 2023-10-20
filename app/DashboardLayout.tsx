@@ -1,14 +1,14 @@
 "use client"
 import Image from "next/image";
-import theexperts from "../public/images/the-experts.svg";
+import logo from "../public/images/logo.png";
 import {Layout, Menu} from "antd";
 import React from "react";
 import {ItemType} from "antd/lib/menu/hooks/useItems";
 import {UserOutlined} from "@ant-design/icons";
 import {useRouter} from "next/navigation";
 import {Footer} from "antd/es/layout/layout";
-import LogoutPage from "@/app/logout/page";
 import {DbUser} from "@/app/hooks/user";
+import LogOut from "@/app/LogOut";
 const {Header, Content, Sider} = Layout;
 
 type DashboardLayoutProps = {
@@ -39,12 +39,15 @@ export default function DashboardLayout({children, colleague}: DashboardLayoutPr
 
     return (
         <Layout className={'h-screen'}>
-            <Header className="header flex justify-between">
-                <div className={'w-44 mt-2'}>
-                    <Image src={theexperts} alt={'the-experts-company-logo'}/>
+            <Header className="header flex justify-between h-16 px-7 pt-4 pb-4">
+                <div className={'w-44'}>
+                    <Image src={logo} alt={'the-experts-company-logo'}/>
                 </div>
-                <div className={'w-44 mt-2'}>
-                    <LogoutPage />
+                <div>
+                    <h1 className={'text-2xl font-bold text-white'}>Talent Manager</h1>
+                </div>
+                <div className={'leading-none'}>
+                    <LogOut />
                 </div>
             </Header>
             <Layout>

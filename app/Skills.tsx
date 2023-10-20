@@ -5,7 +5,6 @@ import {Tab} from "@headlessui/react";
 import {Category, useAllCategories} from "@/app/hooks/categories";
 import SkillList, {ColleagueSkillItem, SkillItem} from "@/app/SkillList";
 import {useFetchAllSkills, useFetchColleagueSkills} from "@/app/hooks/skills";
-import {undefined} from "zod";
 
 const Skills = (props: any) => {
     const categories: Category[] = useAllCategories();
@@ -263,7 +262,7 @@ const Skills = (props: any) => {
                         {({ selected }) => (
                             <button
                                 className={
-                                    selected ? 'flex-1 p-1 w-40 bg-blue-500 text-white' : 'flex-1 p-1 w-40 bg-white text-black'
+                                    selected ? 'flex-1 p-1 w-40 text-white' : 'flex-1 p-1 w-40 bg-white text-black'
                                 }
                             >All
                             </button>
@@ -275,7 +274,7 @@ const Skills = (props: any) => {
                                 {({selected}) => (
                                     <button
                                         className={
-                                            selected ? 'flex-1 p-1 w-40 bg-blue-500 text-white' : 'flex-1 p-1 w-40 bg-white text-black'
+                                            selected ? 'flex-1 p-1 w-40 text-white' : 'flex-1 p-1 w-40 bg-white text-black'
                                         }
                                     >{category.name}
                                     </button>
