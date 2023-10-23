@@ -4,13 +4,15 @@ import React, {Fragment, useEffect, useState} from "react";
 import {Tab} from "@headlessui/react";
 import {Category, useAllCategories} from "@/app/hooks/categories";
 import SkillList, {ColleagueSkillItem, SkillItem} from "@/app/SkillList";
-import {useFetchAllSkills, useFetchColleagueSkills} from "@/app/hooks/skills";
+import {useFetchAllSkills, useFetchColleagueSkills, useFilteredSkills} from "@/app/hooks/skills";
 
 const Skills = (props: any) => {
     const categories: Category[] = useAllCategories();
     const allSkills = useFetchAllSkills();
     const fetchedColleagueSkills: ColleagueSkillItem[] | null = useFetchColleagueSkills(props?.colleagueId);
     const [allColleagueSkillItems, setAllColleagueSkillItems] = useState<ColleagueSkillItem[] | null>([]);
+    const filteredColleagueSkills = useFilteredSkills(props?.colleagueId);
+
 
     const [techniqueColleagueSkillItems, setTechniqueColleagueSkillItems] = useState<ColleagueSkillItem[]>([]);
     const [toolColleagueSkillItems, setToolColleagueSkillItems] = useState<ColleagueSkillItem[]>([]);
