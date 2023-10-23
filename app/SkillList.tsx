@@ -9,7 +9,7 @@ type ColumnTypes = Exclude<EditableTableProps['columns'], undefined>;
 
 export interface ColleagueSkillItem {
     id?: number;
-    key?: React.Key;
+    key?: string|number|bigint;
     colleague_id?: number;
     skill_id?: number;
     ability?: number;
@@ -209,7 +209,7 @@ const EditableCell: React.FC<EditableCellProps> = ({
 
 const SkillList = ({updateTabbedData, deleteCsiFromTabs, addNewSkillToAllSkillsArray, ...props}: any) => {
     const [form] = Form.useForm();
-    const [editingKey, setEditingKey] = useState<string|number>('');
+    const [editingKey, setEditingKey] = useState<string|number|bigint>('');
     const [newSkillName, setNewSkillName] = useState<string>();
 
     const isEditing = (record: ColleagueSkillItem) => record.key === editingKey;
@@ -249,7 +249,7 @@ const SkillList = ({updateTabbedData, deleteCsiFromTabs, addNewSkillToAllSkillsA
         setCurrentColleagueSkills(dbSkills);
     }, [props.colleagueSkills]);
 
-    const edit = (record: Partial<ColleagueSkillItem> & { key: React.Key }) => {
+    const edit = (record: Partial<ColleagueSkillItem> & { key: string|number|bigint }) => {
         form.setFieldsValue({ name: record.name, category: record.category_id, ability: record.ability, interest: record.interest, ...record });
         setEditingKey(record.key);
     };
