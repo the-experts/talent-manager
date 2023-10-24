@@ -11,7 +11,7 @@ const Skills = (props: any) => {
     const allSkills = useFetchAllSkills();
     const fetchedColleagueSkills: ColleagueSkillItem[] | null = useFetchColleagueSkills(props?.colleagueId);
     const [allColleagueSkillItems, setAllColleagueSkillItems] = useState<ColleagueSkillItem[] | null>([]);
-    const filteredColleagueSkills = useFilteredSkills(props?.colleagueId);
+    // const filteredColleagueSkills = useFilteredSkills(allSkills, fetchedColleagueSkills);
 
 
     const [techniqueColleagueSkillItems, setTechniqueColleagueSkillItems] = useState<ColleagueSkillItem[]>([]);
@@ -21,6 +21,8 @@ const Skills = (props: any) => {
     const [otherColleagueSkillItems, setOtherColleagueSkillItems] = useState<ColleagueSkillItem[]>([]);
 
     const [allSkillItems, setAllSkillItems] = useState<SkillItem[]>([]);
+    const [filteredSkills, setFilteredSkills] = useState(allSkills);
+
 
     const techniqueSkillsArray: ColleagueSkillItem[] = [];
     const toolSkillsArray: ColleagueSkillItem[] = [];
@@ -36,7 +38,21 @@ const Skills = (props: any) => {
         if (fetchedColleagueSkills && fetchedColleagueSkills?.length > 0) {
             sortSkillsByCategory(fetchedColleagueSkills);
         }
-    }, [props?.colleagueId, fetchedColleagueSkills]);
+        // check conditions to ensure that allSkills and userSkills are not empty    
+        if (allSkills.length > 0) {
+
+            // creates array of skill ids for specific colleagues
+            const userSkillIds = allColleagueSkillItems.map((skill) => skill.skill_id);
+
+            // filters all skills to ensure that only skills that are not already selected by a colleague are displayed
+            const filtered = allSkills.filter((skill) => !userSkillIds.includes(skill.id));
+
+            setFilteredSkills(filtered);
+
+            console.log(filtered, userSkillIds)
+        }
+    }, [props?.colleagueId, fetchedColleagueSkills, allSkills]);
+
 
     const updateCsiItems = (updatedColleagueSkillItemFromCategoryTab: ColleagueSkillItem, originalCategoryId: number|undefined) => {
         if (!updatedColleagueSkillItemFromCategoryTab || !allColleagueSkillItems?.length) {
@@ -288,7 +304,7 @@ const Skills = (props: any) => {
                 <Tab.Panels className={'text-black'}>
                     <Tab.Panel>
                          <SkillList
-                            allSkills={allSkillItems}
+                            allSkills={filteredSkills}
                             colleagueId={props.colleagueId}
                             colleagueSkills={allColleagueSkillItems}
                             categories={categories}

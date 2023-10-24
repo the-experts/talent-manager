@@ -56,22 +56,3 @@ export function useFetchColleagueSkills(colleagueId: number): ColleagueSkillItem
     return userSkills;
 }
 
-
-
-export function useFilteredSkills(colleagueId) {
-    const allSkills = useFetchAllSkills();
-    const userSkills = useFetchColleagueSkills(colleagueId);
-
-    const [filteredSkills, setFilteredSkills] = useState([]);
-
-    useEffect(() => {
-        if (allSkills.length > 0 && userSkills) {
-            const userSkillIds = userSkills.map((skill) => skill.id);
-            const filtered = allSkills.filter((skill) => !userSkillIds.includes(skill.id));
-            setFilteredSkills(filtered);
-        }
-    }, [allSkills, userSkills, colleagueId]);
-
-    return filteredSkills;
-}
-
