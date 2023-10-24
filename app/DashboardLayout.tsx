@@ -1,8 +1,8 @@
 "use client"
 import Image from "next/image";
 import logo from "../public/images/logo.png";
-import {Layout, Menu} from "antd";
-import React from "react";
+import {Layout, Menu, MenuProps} from "antd";
+import React, {useState} from "react";
 import {ItemType} from "antd/lib/menu/hooks/useItems";
 import {UserOutlined} from "@ant-design/icons";
 import {useRouter} from "next/navigation";
@@ -21,7 +21,7 @@ export default function DashboardLayout({children, colleague}: DashboardLayoutPr
 
     const menuItems: ItemType[] = [{
         key: '1',
-        label: 'Mijn Profiel',
+        label: 'My Profile',
         icon: <UserOutlined/>,
         onClick: () => {
             router.push('/')
@@ -29,10 +29,10 @@ export default function DashboardLayout({children, colleague}: DashboardLayoutPr
     },
         (colleague?.roles_id === 1 || colleague?.roles_id === 2) ? {
         key: '2',
-        label: 'Collega\'s',
+        label: 'Colleagues',
         icon: <UserOutlined/>,
         onClick: () => {
-            router.push('/collegas')
+            router.push('/colleagues')
         }
     } : null
     ];
@@ -54,8 +54,6 @@ export default function DashboardLayout({children, colleague}: DashboardLayoutPr
                 <Sider width={200} className="site-layout-background">
                     <Menu
                         mode="inline"
-                        defaultSelectedKeys={['1']}
-                        defaultOpenKeys={['sub1']}
                         style={{height: '100%', borderRight: 0}}
                         items={menuItems}
                     />
