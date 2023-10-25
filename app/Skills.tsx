@@ -4,15 +4,13 @@ import React, {Fragment, useEffect, useState} from "react";
 import {Tab} from "@headlessui/react";
 import {Category, useAllCategories} from "@/app/hooks/categories";
 import SkillList, {ColleagueSkillItem, SkillItem} from "@/app/SkillList";
-import {useFetchAllSkills, useFetchColleagueSkills, useFilteredSkills} from "@/app/hooks/skills";
+import {useFetchAllSkills, useFetchColleagueSkills} from "@/app/hooks/skills";
 
 const Skills = (props: any) => {
     const categories: Category[] = useAllCategories();
     const allSkills = useFetchAllSkills();
     const fetchedColleagueSkills: ColleagueSkillItem[] | null = useFetchColleagueSkills(props?.colleagueId);
     const [allColleagueSkillItems, setAllColleagueSkillItems] = useState<ColleagueSkillItem[] | null>([]);
-    // const filteredColleagueSkills = useFilteredSkills(allSkills, fetchedColleagueSkills);
-
 
     const [techniqueColleagueSkillItems, setTechniqueColleagueSkillItems] = useState<ColleagueSkillItem[]>([]);
     const [toolColleagueSkillItems, setToolColleagueSkillItems] = useState<ColleagueSkillItem[]>([]);
@@ -31,6 +29,7 @@ const Skills = (props: any) => {
     const otherSkillsArray: ColleagueSkillItem[] = [];
     const allColleagueSkillsArray: ColleagueSkillItem[] = [];
 
+
     useEffect(() => {
         setAllColleagueSkillItems(fetchedColleagueSkills);
         setAllSkillItems(allSkills);
@@ -38,20 +37,38 @@ const Skills = (props: any) => {
         if (fetchedColleagueSkills && fetchedColleagueSkills?.length > 0) {
             sortSkillsByCategory(fetchedColleagueSkills);
         }
-        // check conditions to ensure that allSkills and userSkills are not empty    
+
+    }, [props?.colleagueId, fetchedColleagueSkills]);
+
+    // extra useEffect to check for the combination of changed allSkills and fetchedColleagueSkills
+    // this works because it does check for allSkills and fetchedColleagueSkills changes,
+    // but ignores the change that happens due to prop.colleagueId going from undefined to defined on initial load.
+    // Once the first useEffect ran, both fetchedColleagueSkills and allSkills are filled with data, which allows the 2nd useEffect to run properly.
+
+    // this sets the filteredSkills on initial load.
+    // @todo: we still need to implement the change handling for the following scenarios:
+    // * user adds new colleague-skill-item with existing skill in the all-tab
+    // * user adds a new colleague-skill-item while creating a new skill as well in the all-tab
+    // * user deletes a colleague-skill-item in the all-tab
+
+    // * user adds new colleague-skill-item with existing skill in a category-tab
+    // * user adds a new colleague-skill-item while creating a new skill as well in the category-tab
+    // * user deletes colleague-skill-item in a category-tab
+
+    useEffect(() => {
+        // check conditions to ensure that allSkills and userSkills are not empty
         if (allSkills.length > 0) {
 
             // creates array of skill ids for specific colleagues
-            const userSkillIds = allColleagueSkillItems.map((skill) => skill.skill_id);
+            const userSkillIds = fetchedColleagueSkills?.map((skill) => skill.skill_id);
 
             // filters all skills to ensure that only skills that are not already selected by a colleague are displayed
-            const filtered = allSkills.filter((skill) => !userSkillIds.includes(skill.id));
+            const filtered = allSkills.filter((skill) => !userSkillIds?.includes(skill.id));
 
             setFilteredSkills(filtered);
-
-            console.log(filtered, userSkillIds)
         }
-    }, [props?.colleagueId, fetchedColleagueSkills, allSkills]);
+
+    }, [allSkills, fetchedColleagueSkills]);
 
 
     const updateCsiItems = (updatedColleagueSkillItemFromCategoryTab: ColleagueSkillItem, originalCategoryId: number|undefined) => {
