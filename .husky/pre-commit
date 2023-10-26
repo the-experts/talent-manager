@@ -3,3 +3,4 @@
 
 next lint
 lint-staged
+prettier --check
