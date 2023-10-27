@@ -1,0 +1,7 @@
+build
+coverage
+.husky
+.next
+.vercel
+.vscode
+node_modules

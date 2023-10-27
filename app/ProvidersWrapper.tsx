@@ -1,13 +1,11 @@
-"use client"
+'use client';
+
+import React from 'react';
 
 export default function ProvidersWrapper({
-                                       children
-                                   }: {
-    children: React.ReactNode
+  children,
+}: {
+  children: React.ReactNode;
 }) {
-    return (
-        <div>
-            {children} { /* our entire app -> has access to NextAuth */ }
-        </div>
-    )
+  return <div>{children}</div>;
 }

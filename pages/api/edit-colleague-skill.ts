@@ -2,14 +2,14 @@ import { sql } from '@vercel/postgres';
 import { NextApiResponse, NextApiRequest } from 'next';
 
 export default async function handler(
-    request: NextApiRequest,
-    response: NextApiResponse,
+  request: NextApiRequest,
+  response: NextApiResponse,
 ) {
-    try {
-        const skillToEdit = request.body.skillForColleague;
+  try {
+    const skillToEdit = request.body.skillForColleague;
 
-        if (!skillToEdit) throw new Error('Skill data is required');
-        const editColleagueSkillQuery = await sql`UPDATE colleagues_skills 
+    if (!skillToEdit) throw new Error('Skill data is required');
+    const editColleagueSkillQuery = await sql`UPDATE colleagues_skills 
                                                                              SET skill_id = ${skillToEdit.skill_id},
                                                                              category_id = ${skillToEdit.category_id},
                                                                              interest = ${skillToEdit.interest},
@@ -18,8 +18,8 @@ export default async function handler(
                                                                             WHERE id = ${skillToEdit.id}
                                                                             RETURNING id, skill_id, category_id, interest, ability
                                                                             ;`;
-        return response.status(200).json({ editColleagueSkillQuery });
-    } catch (error) {
-        return response.status(500).json({ error });
-    }
+    return response.status(200).json({ editColleagueSkillQuery });
+  } catch (error) {
+    return response.status(500).json({ error });
+  }
 }

@@ -1,58 +1,57 @@
-import {useEffect, useState} from "react";
-import axios from "axios";
-import {ColleagueSkillItem, SkillItem} from "@/app/SkillList";
+import { useEffect, useState } from 'react';
+import axios from 'axios';
+import { ColleagueSkillItem, SkillItem } from '@/app/SkillList';
 
 export function useFetchAllSkills(): SkillItem[] {
-    const [allSkills, setAllSkills] = useState([]);
+  const [allSkills, setAllSkills] = useState([]);
 
-    useEffect(() => {
+  useEffect(() => {
     const fetchData = async () => {
-        try {
-            const res = await axios.get('/api/fetch-all-skills')
-                .catch((error) => {
-                    console.error('post error fetch-skills', error);
-                });
+      try {
+        const res = await axios.get('/api/fetch-all-skills').catch((error) => {
+          console.error('post error fetch-skills', error);
+        });
 
-            const rows = res?.data?.allSkills?.rows;
-            setAllSkills(rows);
-
-        } catch (error) {
-            console.error('error:', error)
-        }
+        const rows = res?.data?.allSkills?.rows;
+        setAllSkills(rows);
+      } catch (error) {
+        console.error('error:', error);
+      }
     };
 
     fetchData();
-    }, []);
+  }, []);
 
-    return allSkills;
+  return allSkills;
 }
 
-export function useFetchColleagueSkills(colleagueId: number): ColleagueSkillItem[]|null {
-    const [userSkills, setUserSkills] = useState([]);
+export function useFetchColleagueSkills(
+  colleagueId: number,
+): ColleagueSkillItem[] | null {
+  const [userSkills, setUserSkills] = useState([]);
 
-    useEffect(() => {
-        if (!colleagueId) {
-            return;
-        }
+  useEffect(() => {
+    if (!colleagueId) {
+      return;
+    }
 
-        const fetchData = async () => {
-            try {
-                const res = await axios.get(`/api/fetch-colleague-skills?colleague_id=${colleagueId}`)
-                    .catch((error) => {
-                        console.error('post error fetch-colleague-skills', error);
-                    });
+    const fetchData = async () => {
+      try {
+        const res = await axios
+          .get(`/api/fetch-colleague-skills?colleague_id=${colleagueId}`)
+          .catch((error) => {
+            console.error('post error fetch-colleague-skills', error);
+          });
 
-                const rows = res?.data?.allSkills?.rows;
-                setUserSkills(rows);
+        const rows = res?.data?.allSkills?.rows;
+        setUserSkills(rows);
+      } catch (error) {
+        console.error('error:', error);
+      }
+    };
 
-            } catch (error) {
-                console.error('error:', error);
-            }
-        };
+    fetchData();
+  }, [colleagueId]);
 
-        fetchData();
-    }, [colleagueId]);
-
-    return userSkills;
+  return userSkills;
 }
-
