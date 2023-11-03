@@ -21,12 +21,12 @@
 
   /* the/experts color scheme: */
   --color-experts-black: #000;
-  --color-experts-midnight: #1E222D;
-  --color-experts-dark-grey: #2C2F36;
+  --color-experts-midnight: #1e222d;
+  --color-experts-dark-grey: #2c2f36;
   --color-experts-mid-grey: #545760;
-  --color-experts-light-grey: #AFB1B8;
-  --color-experts-orange: #FF710B;
-  --color-experts-white: #FFF;
+  --color-experts-light-grey: #afb1b8;
+  --color-experts-orange: #ff710b;
+  --color-experts-white: #fff;
   /* ************************** */
 
   --primary-glow: conic-gradient(
@@ -209,7 +209,7 @@ button.ant-btn-primary.add-row-button {
   margin: 16px 0;
 }
 
-button[aria-selected="true"][role="tab"] {
+button[aria-selected='true'][role='tab'] {
   background-color: var(--color-experts-orange);
 }
 
@@ -218,7 +218,7 @@ button[aria-selected="true"][role="tab"] {
 }
 
 .no-margin {
-  margin: 0
+  margin: 0;
 }
 
 .margin-right {

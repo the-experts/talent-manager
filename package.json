@@ -9,7 +9,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "prepare": "husky install"
   },
   "dependencies": {
     "@clerk/nextjs": "^4.21.15",
@@ -18,7 +19,9 @@
     "@vercel/postgres": "^0.4.0",
     "antd": "^5.3.2",
     "axios": "^1.5.0",
+    "eslint-plugin-prettier": "^5.0.0-alpha.1",
     "eslint-plugin-react-hooks": "^4.6.0",
+    "lint-staged": "^15.0.2",
     "next": "13.4.4",
     "next-superjson-plugin": "^0.5.6",
     "react": "18.2.0",
@@ -34,9 +37,16 @@
     "autoprefixer": "^10.4.14",
     "eslint": "8.36.0",
     "eslint-config-next": "13.2.4",
-    "prisma": "^4.11.0",
+    "eslint-config-prettier": "^9.0.0",
+    "husky": "^8.0.3",
+    "prettier": "^3.0.3",
+    "prisma": "^4.11.0n",
     "tailwindcss": "^3.2.7",
     "ts-node": "^10.9.1",
     "typescript": "^5.0.2"
-  }
+  },
+  "main": "app/page.tsx",
+  "repository": "git@github.com:the-experts/talent-manager.git",
+  "author": "AndreaBusse29 <andrea.busse@the-experts.nl>",
+  "license": "MIT"
 }
