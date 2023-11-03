@@ -9,7 +9,7 @@ export function useFetchAllSkills(): SkillItem[] {
     const fetchData = async () => {
       try {
         const res = await axios.get('/api/fetch-all-skills').catch((error) => {
-          console.error('post error fetch-skills', error);
+          console.error('error fetch-skills', error);
         });
 
         const rows = res?.data?.allSkills?.rows;

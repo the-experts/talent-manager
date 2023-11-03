@@ -1,22 +1,27 @@
 'use client';
 
 import React from 'react';
-import DashboardLayout from './DashboardLayout';
-import Welcome from './Welcome';
-import Skills from './Skills';
+import DashboardLayout from '../DashboardLayout';
+import Welcome from '../Welcome';
 import { useUserDataHandling } from '@/app/hooks/user';
+import { Divider } from 'antd';
+import AdminSearch from '@/app/AdminSearch';
 
-export default function Home() {
+export default function AdminHome() {
   const { isLoaded, isSignedIn, dbUser: colleague } = useUserDataHandling();
 
   if (!isLoaded || !isSignedIn) {
     return null;
   }
+
   return (
     <DashboardLayout>
       <Welcome colleague={colleague}></Welcome>
-      <div className={'flex place-content-between'}>
-        <Skills colleagueId={colleague?.id} className={'my-6 w-4/5'}></Skills>
+      <Divider />
+      <div className={'text-black'}>
+        <div className={'w-full m-3 mt-5'}>
+          <AdminSearch />
+        </div>
       </div>
     </DashboardLayout>
   );
